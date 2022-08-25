@@ -1,5 +1,3 @@
-console.log('strength.js has been opened');
-
 // Global variables
 let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL;
 
@@ -240,7 +238,7 @@ function processBtwbData(row) {
 }
 
 
-// Convert a bloc row of data to an object for charts.js with e1rm
+// Convert a BLOC row of data to an object for charts.js with e1rm
 // Old:
 // ['Wayne Schuller', '25079', '2021-06-16', 'true', 'workout', '', '3321.0', 'false', 'Bench Press', 'resistance', '', '3', 'standard', '3', 'standard', '118.0', 'standard', '', 'kg', '3', '3', '119.0']
 // New:
@@ -279,17 +277,17 @@ function estimateE1RM(reps, weight) {
 }
 
 
-// Check a row of BLOC data to see if there is a valid lift in this row
-// We basically will assume the row is valid unless it passes certain tests.
+// Check a row of BLOC data to see if there is a valid squat lift in this row
 // The BLOC data format contains many rows that don't actually count as a lift
 function isBlocSquat(row) {
 
+    // Give up on this row if the parser has given us an empty element
     if (!row) return false;
 
     // Give up on this row if there is no date field (should never happen)
     if (!row[workout_date_COL]) return false;
 
-    // Is it a squat?!
+    // Is it a squat? Give up if it is not a squat
     if (row[exercise_name_COL] != "Squat") return false;
 
     // Give up on this row if it is not a completed workout
@@ -302,9 +300,10 @@ function isBlocSquat(row) {
     // Happens when coach leaves comments in the app
     if (!row[assigned_reps_COL]) return false;
 
-    // Reject if all the lifts are zeros
+    // Give up on this row if all the lifts are zero
     if (row[assigned_weight_COL] === 0 && row[actual_weight_COL] === 0) return false;
 
+    // We are happy to approve this row as a valid squat lift
     return true;
 }
 
