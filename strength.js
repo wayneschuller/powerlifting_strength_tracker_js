@@ -9,8 +9,6 @@ function readCSV () {
     let reader = new FileReader; 
 
     reader.onload = function () {
-            let csv = reader.result;
-
             // FIXME - we can run papa parse at the higher file reader level with good features
             let data = Papa.parse(reader.result, { dynamicTyping: true });
             let columnNames = data.data[0];
