@@ -19,7 +19,8 @@ I am using this project to learn a number of different web technologies so the c
 
 This project relies on the following opensource projects: 
 - [charts.js](https://www.chartjs.org/)
-- charts.js data adaptor plugin
+- charts.js data labels plugin 
+- charts.js date adaptor plugin
 - charts.js zoom plugin
 - [Papa Parse](https://www.papaparse.com/) CSV processor.
 
