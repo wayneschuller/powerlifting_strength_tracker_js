@@ -206,16 +206,18 @@ function processBtwbData(row) {
         // console.log(`Procesing lift ${lift}`);
 
         // Get number of reps
-        let regex = /^[0-9]+/gm;
+        let regex = /^[0-9]+/gm;  // FIXME: does this work for 10+ reps?
         let result = regex.exec(lift);
         if (!result) continue;
         curReps = parseInt(result[0]);
+        if (curReps == 0) continue; // FIXME: check why this would happen
 
         // Get weight
         regex = /[0-9|\.]+\skg$/gm; 
         result = regex.exec(lift);
         if (!result) continue;
         let curWeight = parseInt(result[0].slice(0, result[0].length-2)); // Remove the kg off the end
+        if (curWeight == 0) continue;
         
         // console.log(`discovered curReps: ${curReps}, curWeight: ${curWeight}`);
 
