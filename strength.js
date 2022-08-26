@@ -207,7 +207,7 @@ function processBtwbData(row) {
         let regex = /^[0-9]+/gm;  // FIXME: does this work for 10+ reps?
         let result = regex.exec(lift);
         if (!result) continue;
-        curReps = parseInt(result[0]);
+        let curReps = parseInt(result[0]);
         if (curReps == 0) continue; // FIXME: check why this would happen
 
         // Get weight
