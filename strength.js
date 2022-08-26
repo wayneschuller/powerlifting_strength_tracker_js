@@ -428,16 +428,15 @@ function getChartConfig () {
                     position: 'nearest',
                     callbacks: {
                         title: function(context) {
-                           const d = new Date(context[0].parsed.x)
-                           const formattedDate = d.toLocaleString([], {
-                            year:   'numeric',
-                            month:  'long',
-                            day:   'numeric',
-                           })
+                            const d = new Date(context[0].parsed.x)
+                            const formattedDate = d.toLocaleString([], {
+                                year:   'numeric',
+                                month:  'long',
+                                day:   'numeric',
+                            })
                            return(formattedDate);
                         },
                         label: function(context) {
-                            // console.log(`inside tooltip callback`);
                             return data.datasets[context.datasetIndex].data[context.dataIndex].label;
                         },
                     }
