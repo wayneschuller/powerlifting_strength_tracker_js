@@ -253,9 +253,9 @@ function processBtwbData(row) {
 
     // console.log(`lifted_reps: ${lifted_reps}, lifted weight: ${lifted_weight}, e1rm: ${oneRepMax}`); 
     if (lifted_reps === 1)
-        return {x:row[workout_date_COL], y: onerepmax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
+        return {x:row[workout_date_COL], y: oneRepMax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
     else
-        return {x:row[workout_date_COL], y: onerepmax, label:`Potential 1@${onerepmax}kg from ${lifted_reps}@${lifted_weight}kg`};
+        return {x:row[workout_date_COL], y: oneRepMax, label:`Potential 1@${oneRepMax}kg from ${lifted_reps}@${lifted_weight}kg`};
 }
 
 
@@ -279,13 +279,13 @@ function processBlocData(row) {
     }
     
     // Calculate 1RM for the set
-    let onerepmax = estimateE1RM(lifted_reps, lifted_weight);
+    let oneRepMax = estimateE1RM(lifted_reps, lifted_weight);
     // console.log(`lifted_reps: ${lifted_reps}, lifted weight: ${lifted_weight}, e1rm: ${onerepmax}`); 
 
     if (lifted_reps === 1)
-        return {x:row[workout_date_COL], y: onerepmax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
+        return {x:row[workout_date_COL], y: oneRepMax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
     else
-        return {x:row[workout_date_COL], y: onerepmax, label:`Potential 1@${onerepmax}kg from ${lifted_reps}@${lifted_weight}kg`};
+        return {x:row[workout_date_COL], y: oneRepMax, label:`Potential 1@${oneRepMax}kg from ${lifted_reps}@${lifted_weight}kg`};
 }
 
 // Return a rounded 1 rep max using Epley formula
