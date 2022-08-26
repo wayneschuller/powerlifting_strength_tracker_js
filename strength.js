@@ -203,8 +203,8 @@ function isBtwbLift(row) {
 
 // Convert a BTWB row of data to an object for charts.js graph with our e1rms over time
 function processBtwbData(row) {
-    let lifted_reps = Math.floor(Math.random() * 5);
-    let lifted_weight = Math.floor(Math.random() * 100) + 50;
+    let lifted_reps = 0;
+    let lifted_weight = 0;
 
     // console.log(`processBtwbData passed: ${row}`);
 
