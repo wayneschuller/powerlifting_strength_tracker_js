@@ -1,7 +1,9 @@
 // Global variables
 let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL;
 
-let graphData = []; // array of objects in charts.js friendly format (x, y, label)
+let squatGraphData = []; // array of objects in charts.js friendly format (x, y, label)
+let deadliftGraphData = [];
+let benchGraphData = [];
 
 function readCSV () {
     let reader = new FileReader; 
@@ -63,10 +65,18 @@ function parseBtwbCSV(data) {
       
     console.log(`Excellent BTWB data set header row.`);
 
-    let squatData = data.filter(isBtwbSquat); // filter for squat rows 
-        
-    graphData = squatData.map(processBtwbData); // convert every row best e1rm to chart.js style
-        
+    // Back Squat
+    let lifts = data.filter(isBtwbLift, "Back Squat"); // filter for squat rows 
+    squatGraphData = lifts.map(processBtwbData); // convert every row best e1rm to chart.js style
+    
+    // Deadlift
+    lifts = data.filter(isBtwbLift, "Deadlift");  
+    deadliftGraphData = lifts.map(processBtwbData); // convert every row best e1rm to chart.js style
+
+    // Bench Press
+    lifts = data.filter(isBtwbLift, "Bench Press"); 
+    benchGraphData = lifts.map(processBtwbData); // convert every row best e1rm to chart.js style
+
     //console.log(`Created graphData: ${JSON.stringify(graphData)}`);
 }
 
@@ -129,11 +139,20 @@ function parseBlocCSV(data) {
       
     console.log("Excellent BLOC data set header row.");
 
-    let lifts = data.filter(isBlocSquat); // get BLOC format squats with actual reps + weight
+    // Squat
+    let lifts = data.filter(isBlocLift, "Squat"); // get BLOC format squats with actual reps + weight
+    squatGraphData = lifts.map(processBlocData); // Process e1rms to chart.js style
+    squatGraphData = removeDupes(squatGraphData); 
 
-    graphData = lifts.map(processBlocData); // Process e1rms to chart.js style
+    // Deadlift
+    lifts = data.filter(isBlocLift, "Deadlift"); // get BLOC format deadlifts with actual reps + weight
+    deadliftGraphData = lifts.map(processBlocData); // Process e1rms to chart.js style
+    deadliftGraphData = removeDupes(deadliftGraphData); 
 
-    graphData = removeDupes(graphData); 
+    // Bench Press
+    lifts = data.filter(isBlocLift, "Bench Press"); // get BLOC format bench press with actual reps + weight
+    benchGraphData = lifts.map(processBlocData); // Process e1rms to chart.js style
+    benchGraphData = removeDupes(benchGraphData); 
 
     // console.log(`CSV had ${data.length} rows with ${graphData.length} processed e1rm lifts.`);
 }
@@ -168,13 +187,18 @@ function removeDupes(arr) {
 }
 
 // Look for squat data in this BTWB format row 
-function isBtwbSquat(row) {
-    let regex = /(Back Squats)/gm;
-    let result = regex.exec(row[description_COL]);
-    // console.log(`isSquat: row: ${row}, regex result: ${result}`);
+// This is a filter function that will also be passed string with name of lift
+function isBtwbLift(row) {
 
-    if (result === null) return false; // Not a back squat
-    else return true;
+    console.log(`isBtwbLift ${this} passed: ${JSON.stringify(row)}`);
+
+    if (!row || row[0] === null) return false;
+
+    let result = row[description_COL].includes(this); 
+
+    console.log(`Did we find a ${this}? ${result}`);
+
+    return result;
 }
 
 // Convert a BTWB row of data to an object for charts.js graph with our e1rms over time
@@ -189,12 +213,7 @@ function processBtwbData(row) {
             return []; // what to return when failure? null or []?
     }
 
-    // Check for Squat
-    let regex = /(Back Squats)/gm;
-    let result = regex.exec(row[description_COL]);
-    if (!result) return []; // Not a back squat
-
-    let lifts = row[description_COL].split(/\r?\n/);
+    let lifts = row[description_COL].split(/\r?\n/); // BTWB has newlines inside the one cell entry
 
     // console.log(`Lifts is split into: ${JSON.stringify(lifts)}`);
    
@@ -279,7 +298,8 @@ function estimateE1RM(reps, weight) {
 
 // Check a row of BLOC data to see if there is a valid squat lift in this row
 // The BLOC data format contains many rows that don't actually count as a lift
-function isBlocSquat(row) {
+// Filter function will also take a string with name of lift
+function isBlocLift(row) {
 
     // Give up on this row if the parser has given us an empty element
     if (!row) return false;
@@ -288,7 +308,7 @@ function isBlocSquat(row) {
     if (!row[workout_date_COL]) return false;
 
     // Is it a squat? Give up if it is not a squat
-    if (row[exercise_name_COL] != "Squat") return false;
+    if (row[exercise_name_COL] != this) return false;
 
     // Give up on this row if it is not a completed workout
     if (!row[completed_COL]) return false;
@@ -313,18 +333,45 @@ function isBlocSquat(row) {
 // {x:'2021-06-16', y:130, label:'3@119kg'}
 function getChartConfig () {
     const data = {
-      datasets: [{
-        label: 'Squat Progress',
-        backgroundColor: 'rgb(255, 0, 0)',
-        borderColor: 'rgb(50, 50, 50)',
-        borderWidth: 3,
-        pointStyle: 'circle',
-        radius: 4,
-        hitRadius: 15,
-        hoverRadius: 10,
-        cubicInterpolationMode: 'monotone',
-        data: graphData,
-      }]
+        datasets: [
+        {
+            label: 'Squat',
+            backgroundColor: 'rgb(255, 0, 0)',
+            borderColor: 'rgb(50, 50, 50)',
+            borderWidth: 3,
+            pointStyle: 'circle',
+            radius: 4,
+            hitRadius: 15,
+            hoverRadius: 10,
+            cubicInterpolationMode: 'monotone',
+            data: squatGraphData,
+        },
+        {
+            label: 'Deadlift',
+            backgroundColor: 'rgb(0, 255, 0)',
+            borderColor: 'rgb(50, 50, 50)',
+            borderWidth: 3,
+            pointStyle: 'circle',
+            radius: 4,
+            hitRadius: 15,
+            hoverRadius: 10,
+            cubicInterpolationMode: 'monotone',
+            data: deadliftGraphData,
+        },
+        {
+            label: 'Bench Press',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(50, 50, 50)',
+            borderWidth: 3,
+            pointStyle: 'circle',
+            radius: 4,
+            hitRadius: 15,
+            hoverRadius: 10,
+            cubicInterpolationMode: 'monotone',
+            data: benchGraphData,
+        }
+
+    ]
     };
 
     let delayed;
