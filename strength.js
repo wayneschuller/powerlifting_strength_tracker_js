@@ -252,8 +252,10 @@ function processBtwbData(row) {
     }
 
     // console.log(`lifted_reps: ${lifted_reps}, lifted weight: ${lifted_weight}, e1rm: ${oneRepMax}`); 
-    return {x:row[workout_date_COL], y: oneRepMax, label:`Estimated ${oneRepMax}kg from ${lifted_reps}@${lifted_weight}kg`};
-
+    if (lifted_reps === 1)
+        return {x:row[workout_date_COL], y: onerepmax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
+    else
+        return {x:row[workout_date_COL], y: onerepmax, label:`Potential 1@${onerepmax}kg from ${lifted_reps}@${lifted_weight}kg`};
 }
 
 
@@ -279,7 +281,11 @@ function processBlocData(row) {
     // Calculate 1RM for the set
     let onerepmax = estimateE1RM(lifted_reps, lifted_weight);
     // console.log(`lifted_reps: ${lifted_reps}, lifted weight: ${lifted_weight}, e1rm: ${onerepmax}`); 
-    return {x:row[workout_date_COL], y: onerepmax, label:`Estimated ${onerepmax}kg from ${lifted_reps}@${lifted_weight}kg`};
+
+    if (lifted_reps === 1)
+        return {x:row[workout_date_COL], y: onerepmax, label:`Lifted ${lifted_reps}@${lifted_weight}kg`};
+    else
+        return {x:row[workout_date_COL], y: onerepmax, label:`Potential 1@${onerepmax}kg from ${lifted_reps}@${lifted_weight}kg`};
 }
 
 // Return a rounded 1 rep max using Epley formula
@@ -421,10 +427,19 @@ function getChartConfig () {
                     enabled: true,
                     position: 'nearest',
                     callbacks: {
-                            label: function(context) {
-                                // console.log(`inside tooltip callback`);
-                                return data.datasets[context.datasetIndex].data[context.dataIndex].label;
-                            },
+                        title: function(context) {
+                           const d = new Date(context[0].parsed.x)
+                           const formattedDate = d.toLocaleString([], {
+                            year:   'numeric',
+                            month:  'long',
+                            day:   'numeric',
+                           })
+                           return(formattedDate);
+                        },
+                        label: function(context) {
+                            // console.log(`inside tooltip callback`);
+                            return data.datasets[context.datasetIndex].data[context.dataIndex].label;
+                        },
                     }
                 },
                 legend: {
@@ -436,13 +451,19 @@ function getChartConfig () {
                 }
             },
             scales: {
-                    xAxis: {
-                        type: 'time',
-                        time: {
-                            unit: 'quarter'
-                        }
+                xAxis: {
+                    type: 'time',
+                    time: {
+                        unit: 'quarter'
                     },
-                //yAxis: {min: 0, max: 250}
+                    ticks: {
+                        showLabelBackdrop: true
+                    }
+                },
+                yAxis: {
+                    suggestedMin: 50, 
+                    suggestedMax: 225
+                }
             },
 
         }
