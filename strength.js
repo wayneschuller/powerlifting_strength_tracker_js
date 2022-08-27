@@ -188,7 +188,8 @@ function parseBlocCSV(data) {
 }
 
 
-// Load the BLOC data as a liftEntry object into rawLiftData
+// Parse a row of BLOC data as liftEntry objects into rawLiftData
+// (a BLOC row can have multiple lifts inside it)
 function parseBtwbRow(row) {
 
     // console.log(`parseBtwbRow: ${JSON.stringify(row)}`);
@@ -240,7 +241,7 @@ function parseBtwbRow(row) {
 }
 
 
-// Load the BLOC data as a liftEntry object into rawLiftData
+// Parse a row of BLOC data as a liftEntry object into rawLiftData
 function parseBlocRow(row) {
 
     if (!row || row[0] === null) {
