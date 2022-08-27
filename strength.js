@@ -43,6 +43,8 @@ function readCSV () {
     reader.readAsBinaryString(fileInput.files[0]);
 }
 
+// Process the RawLiftData array of lifts into charts.js compatible graphdata.
+// FIXME: use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
 function processRawLiftData() {
 
     for (let i = 0; i < rawLiftData.length; i++) {
@@ -252,8 +254,8 @@ function parseBlocRow(row) {
     // Give up on this row if missed_COL is true 
     if (row[missed_COL] === true) return false;
 
-    // Give up on this row if there is no assigned reps 
-    // Happens when coach leaves comments in the app
+    // Give up on this row if there are no assigned reps 
+    // Happens when a BLOC coach leaves comments in the web app
     if (!row[assigned_reps_COL]) return false;
 
     let lifted_reps = row[assigned_reps_COL];
@@ -301,10 +303,10 @@ function getChartConfig () {
 
     // Make datasets of the first five lifts. FIXME: how would you do the 5 most popular lifts in the data? //
     let dataSets = [];
-    for (let j = 0; j < 5; j++) {
+    for (let i = 0; i < 10; i++) {
         dataSets.push({
-            label: processedData[j].name,
-            backgroundColor: colors[j],
+            label: processedData[i].name,
+            backgroundColor: colors[i],
             borderColor: 'rgb(50, 50, 50)',
             borderWidth: 3,
             pointStyle: 'circle',
@@ -312,7 +314,7 @@ function getChartConfig () {
             hitRadius: 15,
             hoverRadius: 10,
             cubicInterpolationMode: 'monotone',
-            data: processedData[j].graphData,
+            data: processedData[i].graphData,
         });
     }
         
