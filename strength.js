@@ -17,14 +17,14 @@ function readCSV () {
 
                 // console.log("this is bloc data CSV");
                 // Here are the essential BLOC column names from their CSV export as of 2022
-                if ((workout_date_COL = columnNames.indexOf("workout_date")) === -1) return; 
-                if ((completed_COL = columnNames.indexOf("workout_completed")) === -1) return; 
-                if ((exercise_name_COL = columnNames.indexOf("exercise_name")) === -1) return; 
-                if ((assigned_reps_COL = columnNames.indexOf("assigned_reps")) === -1) return; 
-                if ((assigned_weight_COL = columnNames.indexOf("assigned_weight")) === -1) return; 
-                if ((actual_reps_COL = columnNames.indexOf("actual_reps")) === -1) return; 
-                if ((actual_weight_COL = columnNames.indexOf("actual_weight")) === -1) return; 
-                if ((missed_COL = columnNames.indexOf("assigned_exercise_missed")) === -1) return; 
+                workout_date_COL = columnNames.indexOf("workout_date");
+                completed_COL = columnNames.indexOf("workout_completed");
+                exercise_name_COL = columnNames.indexOf("exercise_name");
+                assigned_reps_COL = columnNames.indexOf("assigned_reps");
+                assigned_weight_COL = columnNames.indexOf("assigned_weight");
+                actual_reps_COL = columnNames.indexOf("actual_reps");
+                actual_weight_COL = columnNames.indexOf("actual_weight");
+                missed_COL = columnNames.indexOf("assigned_exercise_missed");
                 data.data.forEach(parseBlocRow);
 
             } else if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
