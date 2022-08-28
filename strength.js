@@ -12,16 +12,27 @@ function readCSV () {
             let data = Papa.parse(reader.result, { dynamicTyping: true });
             let columnNames = data.data[0];
 
-            // Detect what kind of CSV file this is based on a sample of test columns
+            // Detect what kind of CSV file this is based on a sample of test columns in the first row
             if (columnNames[0] === "user_name" && columnNames[1] === "workout_id") {
 
                 // console.log("this is bloc data CSV");
-                parseBlocCSV(data.data);  // Loads the data into rawLiftData[]
+                // Here are the essential BLOC column names from their CSV export as of 2022
+                if ((workout_date_COL = columnNames.indexOf("workout_date")) === -1) return; 
+                if ((completed_COL = columnNames.indexOf("workout_completed")) === -1) return; 
+                if ((exercise_name_COL = columnNames.indexOf("exercise_name")) === -1) return; 
+                if ((assigned_reps_COL = columnNames.indexOf("assigned_reps")) === -1) return; 
+                if ((assigned_weight_COL = columnNames.indexOf("assigned_weight")) === -1) return; 
+                if ((actual_reps_COL = columnNames.indexOf("actual_reps")) === -1) return; 
+                if ((actual_weight_COL = columnNames.indexOf("actual_weight")) === -1) return; 
+                if ((missed_COL = columnNames.indexOf("assigned_exercise_missed")) === -1) return; 
+                data.data.forEach(parseBlocRow);
 
             } else if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
 
                 // console.log("This is BTWB data CSV");
-                parseBtwbCSV(data.data);  // Loads the data into rawLiftData[]
+                workout_date_COL = columnNames.indexOf("Date");
+                description_COL = columnNames.indexOf("Description");
+                data.data.forEach(parseBtwbRow);
 
             } else {
                 console.error("Did not detect CSV format. Currently we only process CSV data from Barbell Logic Online Coaching app and Beyond the Whiteboard app");
@@ -89,112 +100,13 @@ function processRawLiftData() {
     console.log(`We now have ${processedData.length} types of lifts`);
 }
 
-// Parse BTBW into our generic rawLiftData array structure
-function parseBtwbCSV(data) {
-
-    let columnNames = data[0]; // header row
-
-    // Here are the BTWB column names from their CSV export as of 2022
-    const DATEFIELD = "Date";
-    const DESCRIPTION = "Description";
-
-    // Iterate through the header row and find our essential column indexes
-    // We do not assume consistent column order.
-    for (let col = 0; col < columnNames.length; col++) {
-
-        // console.log("Column name is: %s (%s)", columnNames[col], col);
-        switch (columnNames[col]) {
-            case DATEFIELD:
-                workout_date_COL = col;
-                break;
-            case DESCRIPTION:
-                description_COL = col;
-                break;
-        }
-    }
-
-    if (workout_date_COL == undefined || description_COL == undefined) return; 
-      
-    console.log(`Excellent BTWB data set header row.`);
-
-    data.shift(); // remove header row
-    data.forEach(parseBtwbRow);
-    console.log(`We have parsed ${rawLiftData.length} lifts of raw data. First one is ${JSON.stringify(rawLiftData[0].name)}`);
-}
-
-// Parse Barbell Logic app workout data CSV into the global graphData array
-function parseBlocCSV(data) {
-    let columnNames = data[0]; // header row
-
-    // Here are the essential BLOC column names from their CSV export as of 2022
-    const DATEFIELD = "workout_date";
-    const COMPLETED = "workout_completed";
-    const EXERCISENAME = "exercise_name";
-    const ASSIGNEDREPS = "assigned_reps";
-    const ASSIGNEDWEIGHT = "assigned_weight";
-    const ACTUALREPS = "actual_reps";
-    const ACTUALWEIGHT = "actual_weight";
-    const MISSED = "assigned_exercise_missed"; 
-
-    // Iterate through the header row find our column indexes
-    // We do not assume consistent column order.
-    for (let col = 0; col < columnNames.length; col++) {
-
-        //console.log("Column name is: %s", columnNames[col]);
-        switch (columnNames[col]) {
-            case DATEFIELD:
-            workout_date_COL = col;
-            break;
-        case COMPLETED:
-            completed_COL = col;
-            break;
-        case EXERCISENAME:
-            exercise_name_COL = col;
-            break;
-        case ASSIGNEDREPS:
-            assigned_reps_COL = col;
-            break;
-        case ASSIGNEDWEIGHT:
-            assigned_weight_COL = col;
-            break;  
-        case ACTUALREPS:
-            actual_reps_COL = col;
-            break;
-        case ACTUALWEIGHT:
-            actual_weight_COL = col;
-            break;
-        case MISSED:
-            missed_COL = col;
-        }
-    }
-
-    // Give up if we did not find all our expected BLOC data column names
-    // FIXME: this should check for undefined explicitly - if any are column 0 then they will trigger this
-    if (!workout_date_COL ||
-        !completed_COL ||
-        !exercise_name_COL ||
-        !assigned_reps_COL ||
-        !assigned_weight_COL ||
-        !actual_reps_COL ||
-        !actual_weight_COL) 
-        return; 
-      
-    console.log("Excellent BLOC data set header row.");
-
-    data.shift(); // remove header row
-    data.forEach(parseBlocRow);
-    console.log(`We have parsed ${rawLiftData.length} lifts of raw data. First one is ${JSON.stringify(rawLiftData[0].name)}`);
-
-}
-
-
 // Load the BLOC data as a liftEntry object into rawLiftData
 function parseBtwbRow(row) {
 
     // console.log(`parseBtwbRow: ${JSON.stringify(row)}`);
 
     if (!row || row[0] === null) {
-            console.log(`processBtwbRow skipping bad row: ${JSON.stringify(row)}`);
+            // console.log(`processBtwbRow skipping bad row: ${JSON.stringify(row)}`);
             return; 
     }
 
@@ -303,7 +215,7 @@ function getChartConfig () {
 
     // Make datasets of the first five lifts. FIXME: how would you do the 5 most popular lifts in the data? //
     let dataSets = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         dataSets.push({
             label: processedData[i].name,
             backgroundColor: colors[i],
