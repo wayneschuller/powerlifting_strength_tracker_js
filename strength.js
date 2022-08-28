@@ -212,7 +212,7 @@ function getChartConfig () {
     colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(100, 100, 0)', 'rgb(0, 100, 100)'];
 
     // Make line config datasets of the most popular lift types
-    let numGraphLines = 4;
+    let numGraphLines = 12;
     let dataSets = [];
     for (let i = 0; i < numGraphLines; i++) {
         dataSets.push({
