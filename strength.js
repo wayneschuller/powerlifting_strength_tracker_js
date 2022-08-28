@@ -211,9 +211,10 @@ function getChartConfig () {
 
     colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(100, 100, 0)', 'rgb(0, 100, 100)'];
 
-    // Make datasets of the first five lifts. FIXME: how would you do the 5 most popular lifts in the data? //
+    // Make line config datasets of the most popular lift types
+    let numGraphLines = 4;
     let dataSets = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < numGraphLines; i++) {
         dataSets.push({
             label: processedData[i].name,
             backgroundColor: colors[i],
