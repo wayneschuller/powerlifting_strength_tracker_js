@@ -152,7 +152,7 @@ function parseBtwbRow(row) {
 }
 
 
-// Load the BLOC data as a liftEntry object into rawLiftData
+// Parse a row of BLOC data as a liftEntry object into rawLiftData
 function parseBlocRow(row) {
 
     if (!row || row[0] === null) {
