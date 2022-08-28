@@ -6,9 +6,8 @@ let processedData = []; // Array with one element per lift type of charts.js gra
 
 function readCSV () {
     let reader = new FileReader; 
-
+    
     reader.onload = function () {
-            // FIXME - we can run papa parse at the higher file reader level with good features
             let data = Papa.parse(reader.result, { dynamicTyping: true });
             let columnNames = data.data[0];
 
@@ -50,8 +49,9 @@ function readCSV () {
             let canvas = document.getElementById('myChart');
             const myChart = new Chart(canvas, getChartConfig());
     }
-    // start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsBinaryString(fileInput.files[0]);
+
+    // Start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsText(fileInput.files[0]);
 }
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
@@ -156,7 +156,7 @@ function parseBtwbRow(row) {
 function parseBlocRow(row) {
 
     if (!row || row[0] === null) {
-            console.log(`parseBlocRow skipping bad row: ${JSON.stringify(row)}`);
+            // console.log(`parseBlocRow skipping bad row: ${JSON.stringify(row)}`);
             return; 
     }
 
@@ -172,8 +172,6 @@ function parseBlocRow(row) {
 
     let lifted_reps = row[assigned_reps_COL];
     let lifted_weight = row[assigned_weight_COL];
-
-    // console.log(`Processing top: lifted_reps: ${lifted_reps}, lifted weight: ${lifted_weight}`); 
 
     // Override if there is an actual_reps and actual_weight as well
     // This happens when the person lifts different to what was assigned by their coach
