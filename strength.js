@@ -246,7 +246,7 @@ function getChartConfig () {
             // x: {min: '2015-09-01', max: '2022-08-30', minRange: 50},
             // y: {min: 0, max: 250, minRange: 50}
             x: {min: 'original', max: 'original', minRange: 50},
-            y: {min: 'original', max: 'original', minRange: 100},
+            y: {min: 'original', max: 'original', minRange: 50},
         },
         pan: {
             enabled: true,
