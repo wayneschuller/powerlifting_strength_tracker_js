@@ -3,6 +3,7 @@ let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assig
 
 let rawLiftData = []; // Array of lift objects
 let processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
+let myChart; 
 
 function readCSV () {
     let reader = new FileReader; 
@@ -46,8 +47,8 @@ function readCSV () {
             processedData.sort((a, b)=> b.graphData.length - a.graphData.length);
 
             // Draw the chart now we have data.
-            let canvas = document.getElementById('myChart');
-            const myChart = new Chart(canvas, getChartConfig());
+            let canvas = document.getElementById('myChartCanvas');
+            myChart = new Chart(canvas, getChartConfig());
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -336,4 +337,8 @@ function getChartConfig () {
         }
     };
     return config;
+}
+
+function resetZoom () {
+    if (myChart) myChart.resetZoom();
 }

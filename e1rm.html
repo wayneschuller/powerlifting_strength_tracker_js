@@ -49,9 +49,14 @@
 
     <div class="chartBox"}
             <div>
-                <canvas id="myChart"></canvas>
+                <canvas id="myChartCanvas"></canvas>
             </div>
     </div>
+    <button id="reset" type="button" >Reset Zoom</button>
+    <script>
+        var resetInput = document.getElementById("reset");
+        resetInput.addEventListener('click', resetZoom);
+    </script>
 
 
 </body>
