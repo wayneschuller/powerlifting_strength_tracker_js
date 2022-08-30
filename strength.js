@@ -212,7 +212,7 @@ function getChartConfig () {
     colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(100, 100, 0)', 'rgb(0, 100, 100)'];
 
     // Make line config datasets of the most popular lift types
-    let numGraphLines = 12;
+    let numGraphLines = 4;
     let dataSets = [];
     for (let i = 0; i < numGraphLines; i++) {
         dataSets.push({
@@ -232,6 +232,35 @@ function getChartConfig () {
     const data = {
         datasets: dataSets, 
     };
+
+    const zoomOptions = {
+        limits: {
+            // FIXME: we can work out sensible values from our data set
+            // x: {min: '2015-09-01', max: '2022-08-30', minRange: 50},
+            // y: {min: 0, max: 250, minRange: 50}
+            x: {min: 'original', max: 'original', minRange: 50},
+            y: {min: 'original', max: 'original', minRange: 100},
+        },
+        pan: {
+            enabled: true,
+            mode: 'xy',
+        },
+        zoom: {
+            wheel: {
+            enabled: true,
+        },
+            pinch: {
+            enabled: true
+        },
+            mode: 'xy',
+            onZoomComplete({chart}) {
+            // This update is needed to display up to date zoom level in the title.
+            // Without this, previous zoom level is displayed.
+            // The reason is: title uses the same beforeUpdate hook, and is evaluated before zoom.
+            //chart.update('none');
+            }
+        }
+    }
 
     let delayed;
 
@@ -253,21 +282,7 @@ function getChartConfig () {
                 },
             },
             plugins: {
-                zoom: {
-                    zoom: {
-                        wheel: { 
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true,
-                        },
-                        mode: 'xy',
-                    },
-                    pan: {
-                        enabled: true,
-                    },
-                    mode: 'xy',
-                },
+                zoom: zoomOptions,
                 datalabels: {
                     formatter: function(context) {
                         return context.y; 
