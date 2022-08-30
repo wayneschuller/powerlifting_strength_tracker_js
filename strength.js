@@ -43,12 +43,19 @@ function readCSV () {
             processRawLiftData();
 
             // Every element of processedData has a graphData array
-            // Sort our processed data so the most popular lift types are at the beginning
-            processedData.sort((a, b)=> b.graphData.length - a.graphData.length);
+            // Let's sort each graphData array by date (x entry) so it draws lines correctly
+            processedData.forEach(arr => arr.graphData.sort((a,b) => new Date(a.x) - new Date(b.x)));
 
-            // Draw the chart now we have data.
-            let canvas = document.getElementById('myChartCanvas');
-            myChart = new Chart(canvas, getChartConfig());
+            // Also sort our processedData so the most popular lift types get charts first
+            processedData.sort((a, b) => b.graphData.length - a.graphData.length);
+
+            // Draw or update the chart now we have data.
+            if (myChart) {
+                myChart.update();
+            } else {
+                let canvas = document.getElementById('myChartCanvas');
+                myChart = new Chart(canvas, getChartConfig());
+            }
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -60,10 +67,10 @@ function readCSV () {
 function processRawLiftData() {
 
     for (let i = 0; i < rawLiftData.length; i++) {
-        let index = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
+        let liftIndex = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
         // console.log(`Index is ${JSON.stringify(index)}`);
 
-        if (index === -1) {
+        if (liftIndex === -1) {
             let processedLiftType = {
                 name: rawLiftData[i].name,
                 graphData: [],
@@ -71,32 +78,31 @@ function processRawLiftData() {
                 best3RM: null,
                 best1RM: null
             };
-            index = processedData.push(processedLiftType) - 1;
+            liftIndex = processedData.push(processedLiftType) - 1;
         }
         
         let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight);
-        // Do we already have a processed same lift on this same date at the end of the array?
-        // FIXME: this should really search the whole array for the date anywhere
-        // console.log(`processedData[index].graphData: ${processedData[index].graphData}`); 
 
-        if (processedData[index].graphData.at(-1) && 
-            rawLiftData[i].date === processedData[index].graphData.at(-1).x) { 
-            // console.log(`We did this lift today already...`);
-            
-            if (oneRepMax > processedData[index].graphData.at(-1).y) {
-                // Get rid of the old process data so we can push a bigger one on
-                processedData[index].graphData.pop();
-            } else continue;
-        }
-
-        // Push a new graphData item for this lift type.
+        // Prepare our two types of data label
         let label = '';
         if (rawLiftData[i].reps === 1)
             label = `Lifted 1@${rawLiftData[i].weight}kg`;
         else
             label = `Potential 1@${oneRepMax}kg from ${rawLiftData[i].reps}@${rawLiftData[i].weight}kg`;
 
-        processedData[index].graphData.push({x:rawLiftData[i].date, y: oneRepMax, label:`${label}`});
+        // Do we already have any processed data on this date?
+        let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
+        if (dateIndex === -1) {
+            // New lift and new date
+            processedData[liftIndex].graphData.push({x:rawLiftData[i].date, y: oneRepMax, label:`${label}`});
+        } else {
+            // We already have a lift on this date - keep the stronger one
+            if (oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
+                // Better lift, duplicate date
+                processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
+                processedData[liftIndex].graphData[dateIndex].label = label;
+            } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
+        } 
     }
     console.log(`We now have ${processedData.length} types of lifts`);
 }
