@@ -4,6 +4,7 @@ let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assig
 let rawLiftData = []; // Array of lift objects
 let processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 let myChart; 
+let numGraphLines = 4; // How many lifts to show by default (FIXME: make configurable)
 
 function readCSV () {
     let reader = new FileReader; 
@@ -42,13 +43,6 @@ function readCSV () {
             // Process that data into our processedData structure
             processRawLiftData();
 
-            // Every element of processedData has a graphData array
-            // Let's sort each graphData array by date (x entry) so it draws lines correctly
-            processedData.forEach(arr => arr.graphData.sort((a,b) => new Date(a.x) - new Date(b.x)));
-
-            // Also sort our processedData so the most popular lift types get charts first
-            processedData.sort((a, b) => b.graphData.length - a.graphData.length);
-
             // Draw or update the chart now we have data.
             if (myChart) {
                 myChart.update();
@@ -56,6 +50,8 @@ function readCSV () {
                 let canvas = document.getElementById('myChartCanvas');
                 myChart = new Chart(canvas, getChartConfig());
             }
+
+
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -105,6 +101,14 @@ function processRawLiftData() {
         } 
     }
     console.log(`We now have ${processedData.length} types of lifts`);
+
+    // Every element of processedData now has a graphData array
+    // Let's sort each graphData array by date (x entry) so it draws lines correctly
+    // (FIXME: write a custom YYYY-MM-DD compare function as 'new Date' in a sort function is frowned upon)
+    processedData.forEach(arr => arr.graphData.sort((a,b) => new Date(a.x) - new Date(b.x)));
+
+    // Also sort our processedData so the most popular lift types get charts first
+    processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 }
 
 // Load the BLOC data as a liftEntry object into rawLiftData
@@ -219,9 +223,11 @@ function getChartConfig () {
     colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(100, 100, 0)', 'rgb(0, 100, 100)'];
 
     // Make line config datasets of the most popular lift types
-    let numGraphLines = 4;
     let dataSets = [];
     for (let i = 0; i < numGraphLines; i++) {
+
+        // Check if we have this data to chart, then push it on
+        if (processedData[i] && processedData[i].name && processedData[i].graphData)
         dataSets.push({
             label: processedData[i].name,
             backgroundColor: colors[i],
@@ -271,23 +277,25 @@ function getChartConfig () {
 
     let delayed;
 
+    const animationOptions = {
+        onComplete: () => {
+            delayed = true;
+        },
+        delay: (context) => {
+            let delay = 0;
+            if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                delay = context.dataIndex * 8000;
+                }
+            return delay;
+            }
+    }
+
     const config = {
         type: 'line',
         plugins: [ChartDataLabels],
         data: data,
         options: {
-            animations: {
-                onComplete: () => {
-                    delayed = true;
-                },
-                delay: (context) => {
-                    let delay = 0;
-                    if (context.type === 'data' && context.mode === 'default' && !delayed) {
-                        delay = context.dataIndex * 8000;
-                    }
-                    return delay;
-                },
-            },
+            // animations: animationOptions,
             plugins: {
                 zoom: zoomOptions,
                 datalabels: {
