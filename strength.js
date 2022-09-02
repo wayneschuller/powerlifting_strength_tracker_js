@@ -51,6 +51,9 @@ function readCSV () {
                 let canvas = document.getElementById('myChartCanvas');
                 myChart = new Chart(canvas, getChartConfig());
             }
+            // Process achievements and display them after creation
+            processedData.forEach(visualiseAchievements);
+            myChart.update();
 
     }
 
@@ -128,95 +131,71 @@ function processRawLiftData() {
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
-    // Another run through to display achievements
-    processedData.forEach(visualiseAchievements);
+}
+
+
+// Generate annotation config for an achievement
+function rewardStar (date, weight, style, border, background, datasetIndex) {
+
+    return {
+                type: 'point',
+                pointStyle: style,
+                radius: 15,
+                borderWidth: 3,
+                borderColor: border,
+                drawTime: 'afterDraw',
+                xValue: date,
+                yValue: weight,
+                backgroundColor: background,
+                display(chart, options) {
+                    // your logic, for instance the annoatation is shown 
+                    // only if a dataset (in this case the first one) is not hidden
+                    // console.log(`chart passed: ${chart}`);
+                    let meta = chart.chart.getDatasetMeta(datasetIndex);
+                    if (meta === undefined) return false;
+                    return meta.visible;
+                    // return true;
+                },
+                // scaleID: 'y',
+            };
+
 }
 
 // array function to gather interesting achievements from processedData
 function visualiseAchievements(e, index) {
 
-    console.log(`Let's collect some ${e.name} achievements! (index: ${index})`);
+    // console.log(`collecting achievements for ${e.name} (index: ${index})`);
+
+    if (!e) return;
 
     if (e.best1RM) {
-
         // Set point annotation for .best1RM
-        liftAnnotations[`${e.name}best1RM`] =  
-            {
-                type: 'point',
-                pointStyle: 'star',
-                radius: 15,
-                borderWidth: 3,
-                borderColor: 'gold',
-                drawTime: 'beforeDraw',
-                xValue: e.best1RM.date,
-                yValue: e.best1RM.weight,
-                backgroundColor: 'rgba(255, 99, 132, 0.25)',
-                display(chart, options) {
-                    // your logic, for instance the annoatation is shown 
-                    // only if a dataset (in this case the first one) is not hidden
-                    // console.log(`chart passed: ${chart}`);
-                    let meta = chart.chart.getDatasetMeta(index);
-                    if (meta === undefined) return false;
-                    return meta.visible;
-                    // return true;
-                },
-                // scaleID: 'y',
-            };
+        liftAnnotations[`${e.name}_best_1RM`] = rewardStar(e.best1RM.date, e.best1RM.weight, 'star', 'gold', 'rgba(255, 99, 132, 0.25)', index);
+
+        // Update the label with some encouragement 
+        let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
+        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 1RM of all time!`;
     }
 
     if (e.best3RM) {
         // Set point annotation for .best3RM
         let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
-        liftAnnotations[`${e.name}best3RM`] =  
-            {
-                type: 'point',
-                pointStyle: 'triangle',
-                radius: 15,
-                borderWidth: 3,
-                borderColor: 'silver',
-                drawTime: 'beforeDraw',
-                xValue: e.best3RM.date,
-                yValue: e1rm,
-                backgroundColor: 'rgba(255, 99, 132, 0.25)',
-                display(chart, options) {
-                    // your logic, for instance the annoatation is shown 
-                    // only if a dataset (in this case the first one) is not hidden
-                    // console.log(`chart passed: ${chart}`);
-                    let meta = chart.chart.getDatasetMeta(index);
-                    if (meta === undefined) return false;
-                    return meta.visible;
-                    // return true;
-                },
-                // scaleID: 'y',
-            };
+        liftAnnotations[`${e.name}_best_3RM`] = rewardStar(e.best3RM.date, e1rm, 'triangle', 'brown', 'rgba(255, 99, 132, 0.25)', index);  
+
+        // Update the label with some encouragement 
+        let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
+        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 3RM of all time!`;
     }
 
     if (e.best5RM) {
         // Set point annotation for .best5RM
         let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
-        liftAnnotations[`${e.name}best5RM`] =  
-            {
-                type: 'point',
-                pointStyle: 'circle',
-                radius: 15,
-                borderWidth: 3,
-                borderColor: 'bronze',
-                drawTime: 'beforeDraw',
-                xValue: e.best5RM.date,
-                yValue: e1rm,
-                backgroundColor: 'rgba(255, 99, 132, 0.25)',
-                display(chart, options) {
-                    // your logic, for instance the annoatation is shown 
-                    // only if a dataset (in this case the first one) is not hidden
-                    // console.log(`chart passed: ${chart}`);
-                    let meta = chart.chart.getDatasetMeta(index);
-                    if (meta === undefined) return false;
-                    return meta.visible;
-                    // return true;
-                },
-                // scaleID: 'y',
-            };
-    }
+        liftAnnotations[`${e.name}_best_5RM`] = rewardStar(e.best5RM.date, e1rm, 'circle', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
+
+        // Update the label with some encouragement 
+        let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
+        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 5RM of all time!`;
+    };
 }
 
 // Load the BLOC data as a liftEntry object into rawLiftData
@@ -363,6 +342,7 @@ function getChartConfig () {
         datasets: dataSets, 
     };
 
+    
     const zoomOptions = {
         limits: {
             // FIXME: we can work out sensible values from our data set and unit type
