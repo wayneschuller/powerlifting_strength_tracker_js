@@ -69,8 +69,10 @@ function processRawLiftData() {
         if (liftIndex === -1) { 
             let processedLiftType = { 
                 name: rawLiftData[i].name, 
-                graphData: [], best5RM: null, 
-                best3RM: null, best1RM: null 
+                graphData: [], 
+                best5RM: null, 
+                best3RM: null, 
+                best1RM: null 
             }; 
         liftIndex = processedData.push(processedLiftType) - 1; 
         } 
