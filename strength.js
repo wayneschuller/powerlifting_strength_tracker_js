@@ -1,8 +1,9 @@
 // Global variables
 let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL;
 
-let rawLiftData = []; // Array of lift objects
-let processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
+const rawLiftData = []; // Array of lift objects
+const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
+const liftAnnotations = {}; 
 let myChart; 
 let numGraphLines = 4; // How many lifts to show by default (FIXME: make configurable)
 
@@ -51,7 +52,6 @@ function readCSV () {
                 myChart = new Chart(canvas, getChartConfig());
             }
 
-
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -59,32 +59,47 @@ function readCSV () {
 }
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
-// FIXME: use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
+// We also use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
 function processRawLiftData() {
 
     for (let i = 0; i < rawLiftData.length; i++) {
+
         let liftIndex = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
         // console.log(`Index is ${JSON.stringify(index)}`);
-
-        if (liftIndex === -1) {
-            let processedLiftType = {
-                name: rawLiftData[i].name,
-                graphData: [],
-                best5RM: null,
-                best3RM: null,
-                best1RM: null
-            };
-            liftIndex = processedData.push(processedLiftType) - 1;
+        if (liftIndex === -1) { 
+            let processedLiftType = { 
+                name: rawLiftData[i].name, 
+                graphData: [], best5RM: null, 
+                best3RM: null, best1RM: null 
+            }; 
+        liftIndex = processedData.push(processedLiftType) - 1; 
+        } 
+        
+        // Side task - collect some achievements for this lift type
+        switch (rawLiftData[i].reps) {
+            case 5:
+                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight > processedData[liftIndex].best5RM.weight) 
+                        processedData[liftIndex].best5RM = rawLiftData[i];
+                break;
+            case 3:
+                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight > processedData[liftIndex].best3RM.weight) 
+                        processedData[liftIndex].best3RM = rawLiftData[i];
+                break;
+            case 1:
+                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight > processedData[liftIndex].best1RM.weight) 
+                        processedData[liftIndex].best1RM = rawLiftData[i];
+                break;
         }
         
+        // Main task - find the best e1rm estimate on this date
         let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight);
 
-        // Prepare our two types of data label
+        // Prepare our data label
         let label = '';
         if (rawLiftData[i].reps === 1)
-            label = `Lifted 1@${rawLiftData[i].weight}kg`;
+            label = `Lifted 1@${rawLiftData[i].weight}kg.`;
         else
-            label = `Potential 1@${oneRepMax}kg from ${rawLiftData[i].reps}@${rawLiftData[i].weight}kg`;
+            label = `Potential 1@${oneRepMax}kg from ${rawLiftData[i].reps}@${rawLiftData[i].weight}kg.`;
 
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
@@ -100,6 +115,7 @@ function processRawLiftData() {
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
     }
+
     console.log(`We now have ${processedData.length} types of lifts`);
 
     // Every element of processedData now has a graphData array
@@ -109,6 +125,96 @@ function processRawLiftData() {
 
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
+
+    // Another run through to display achievements
+    processedData.forEach(visualiseAchievements);
+}
+
+// array function to gather interesting achievements from processedData
+function visualiseAchievements(e, index) {
+
+    console.log(`Let's collect some ${e.name} achievements! (index: ${index})`);
+
+    if (e.best1RM) {
+
+        // Set point annotation for .best1RM
+        liftAnnotations[`${e.name}best1RM`] =  
+            {
+                type: 'point',
+                pointStyle: 'star',
+                radius: 15,
+                borderWidth: 3,
+                borderColor: 'gold',
+                drawTime: 'beforeDraw',
+                xValue: e.best1RM.date,
+                yValue: e.best1RM.weight,
+                backgroundColor: 'rgba(255, 99, 132, 0.25)',
+                display(chart, options) {
+                    // your logic, for instance the annoatation is shown 
+                    // only if a dataset (in this case the first one) is not hidden
+                    // console.log(`chart passed: ${chart}`);
+                    let meta = chart.chart.getDatasetMeta(index);
+                    if (meta === undefined) return false;
+                    return meta.visible;
+                    // return true;
+                },
+                // scaleID: 'y',
+            };
+    }
+
+    if (e.best3RM) {
+        // Set point annotation for .best3RM
+        let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
+        liftAnnotations[`${e.name}best3RM`] =  
+            {
+                type: 'point',
+                pointStyle: 'triangle',
+                radius: 15,
+                borderWidth: 3,
+                borderColor: 'silver',
+                drawTime: 'beforeDraw',
+                xValue: e.best3RM.date,
+                yValue: e1rm,
+                backgroundColor: 'rgba(255, 99, 132, 0.25)',
+                display(chart, options) {
+                    // your logic, for instance the annoatation is shown 
+                    // only if a dataset (in this case the first one) is not hidden
+                    // console.log(`chart passed: ${chart}`);
+                    let meta = chart.chart.getDatasetMeta(index);
+                    if (meta === undefined) return false;
+                    return meta.visible;
+                    // return true;
+                },
+                // scaleID: 'y',
+            };
+    }
+
+    if (e.best5RM) {
+        // Set point annotation for .best5RM
+        let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
+        liftAnnotations[`${e.name}best5RM`] =  
+            {
+                type: 'point',
+                pointStyle: 'circle',
+                radius: 15,
+                borderWidth: 3,
+                borderColor: 'bronze',
+                drawTime: 'beforeDraw',
+                xValue: e.best5RM.date,
+                yValue: e1rm,
+                backgroundColor: 'rgba(255, 99, 132, 0.25)',
+                display(chart, options) {
+                    // your logic, for instance the annoatation is shown 
+                    // only if a dataset (in this case the first one) is not hidden
+                    // console.log(`chart passed: ${chart}`);
+                    let meta = chart.chart.getDatasetMeta(index);
+                    if (meta === undefined) return false;
+                    return meta.visible;
+                    // return true;
+                },
+                // scaleID: 'y',
+            };
+    }
 }
 
 // Load the BLOC data as a liftEntry object into rawLiftData
@@ -203,7 +309,7 @@ function parseBlocRow(row) {
     rawLiftData.push(liftEntry); // add to our collection of raw data
 }
 
-// Return a rounded 1 rep max using Epley formula
+// Return a rounded 1 rep max
 // For theory see: https://en.wikipedia.org/wiki/One-repetition_maximum 
 // Later on we can add different methods
 // We really only need a method that works for 1-10 reps.
@@ -213,9 +319,18 @@ function estimateE1RM(reps, weight) {
             return 0;
     }
     if (reps == 1) return parseInt(weight); // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
-    return Math.round(weight*(1+reps/30));
+
+
+    //return Math.round(weight*(1+reps/30)); // Epley formula
+    return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula
 }
 
+    function value(ctx, datasetIndex, index, prop) {
+        const meta = ctx.chart.getDatasetMeta(datasetIndex);
+        // console.log(JSON.stringify(meta));
+        const parsed = meta.controller.getParsed(index);
+        return parsed ? parsed[prop] : NaN;
+    }
 
 // Setup a charts.js chart.
 function getChartConfig () {
@@ -248,15 +363,13 @@ function getChartConfig () {
 
     const zoomOptions = {
         limits: {
-            // FIXME: we can work out sensible values from our data set
-            // x: {min: '2015-09-01', max: '2022-08-30', minRange: 50},
-            // y: {min: 0, max: 250, minRange: 50}
+            // FIXME: we can work out sensible values from our data set and unit type
             x: {min: 'original', max: 'original', minRange: 50},
-            y: {min: 'original', max: 'original', minRange: 50},
+            y: {min: 'original', max: 'original', minRange: 200},
         },
         pan: {
             enabled: true,
-            mode: 'xy',
+            mode: 'x',
         },
         zoom: {
             wheel: {
@@ -265,7 +378,7 @@ function getChartConfig () {
             pinch: {
             enabled: true
         },
-            mode: 'xy',
+            mode: 'x',
             onZoomComplete({chart}) {
             // This update is needed to display up to date zoom level in the title.
             // Without this, previous zoom level is displayed.
@@ -288,7 +401,9 @@ function getChartConfig () {
                 }
             return delay;
             }
-    }
+    };
+
+
 
     const config = {
         type: 'line',
@@ -298,6 +413,9 @@ function getChartConfig () {
             // animations: animationOptions,
             plugins: {
                 zoom: zoomOptions,
+                annotation: {
+                    annotations: liftAnnotations,
+                },
                 datalabels: {
                     formatter: function(context) {
                         return context.y; 
