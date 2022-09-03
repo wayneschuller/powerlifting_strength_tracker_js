@@ -16,11 +16,13 @@ You can compare relative progress for different rep ranges of the same lift. If 
 
 I am using this project to learn a number of different web technologies so the code is not always polished.
 
-This project relies on the following opensource projects: 
-- [charts.js](https://www.chartjs.org/)
-- charts.js data labels plugin 
-- charts.js date adaptor plugin
-- charts.js zoom plugin
+This project relies on the following open source projects: 
+- [chart.js](https://www.chartjs.org/)
+- [chart.js data labels plugin](https://github.com/chartjs/chartjs-plugin-datalabels)
+- [chart.js date adaptor plugin](https://github.com/chartjs/chartjs-adapter-date-fns)
+- [chart.js zoom plugin](https://www.chartjs.org/chartjs-plugin-zoom/latest/)
+- [chart.js annotation plugin](https://www.chartjs.org/chartjs-plugin-annotation/latest/)
 - [Papa Parse](https://www.papaparse.com/) CSV processor.
+- and some underlying libraries
 
 This open source project is _not_ affiliated or endorsed by any of the above fitness companies.
