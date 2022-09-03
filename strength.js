@@ -456,7 +456,8 @@ function getChartConfig () {
                 xAxis: {
                     type: 'time',
                     time: {
-                        unit: 'quarter'
+                        // Quarter is good for large data sets - but the defaults should adjust units based on zoom
+                        // unit: 'quarter'
                     },
                     ticks: {
                         showLabelBackdrop: true
