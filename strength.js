@@ -53,6 +53,8 @@ function readCSV () {
             }
             // Process achievements and display them after creation
             processedData.forEach(visualiseAchievements);
+
+            // FIXME: Find max and min after creation and add one weeks padding
             myChart.update();
 
     }
@@ -79,7 +81,9 @@ function processRawLiftData() {
             }; 
         liftIndex = processedData.push(processedLiftType) - 1; 
         } 
-        
+
+        // Side task - collect the first and last date of lift data (used for chart boundaries)
+
         // Side task - collect some achievements for this lift type
         switch (rawLiftData[i].reps) {
             case 5:
@@ -119,6 +123,8 @@ function processRawLiftData() {
                 processedData[liftIndex].graphData[dateIndex].label = label;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
+
+        
     }
 
     console.log(`We now have ${processedData.length} types of lifts`);
@@ -456,17 +462,19 @@ function getChartConfig () {
             scales: {
                 xAxis: {
                     type: 'time',
+                    // suggestedMin: '2021-06-01',
+                    // suggestedMax: '2022-09-10',
                     time: {
-                        // Quarter is good for large data sets - but the default dynamically adjusts units based on zoom
-                        // unit: 'quarter'
+                        minUnit: 'day',
                     },
-                    ticks: {
-                        showLabelBackdrop: true
-                    }
                 },
                 yAxis: {
+                    // FIXME: these should be dynamically adjusted for unit type: imperial or metric
                     suggestedMin: 50, 
                     suggestedMax: 225,
+                    ticks: {
+                        font: {size: 15},
+                    },
                 }
             },
         }
