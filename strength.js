@@ -406,6 +406,7 @@ function getChartConfig () {
     };
 
 
+    Chart.defaults.font.family = 'Lato';
 
     const config = {
         type: 'line',
@@ -422,7 +423,7 @@ function getChartConfig () {
                     formatter: function(context) {
                         return context.y; 
                         },
-                    // font: { weight: 'bold'},
+                    //font: { weight: 'bold'},
                     align: 'end',
                     anchor: 'end',
                 },
@@ -447,7 +448,7 @@ function getChartConfig () {
                 legend: {
                     labels: {
                         font: {
-                            size:20
+                            size:18
                         }
                     }
                 }
@@ -456,7 +457,7 @@ function getChartConfig () {
                 xAxis: {
                     type: 'time',
                     time: {
-                        // Quarter is good for large data sets - but the defaults should adjust units based on zoom
+                        // Quarter is good for large data sets - but the default dynamically adjusts units based on zoom
                         // unit: 'quarter'
                     },
                     ticks: {
@@ -468,7 +469,6 @@ function getChartConfig () {
                     suggestedMax: 225,
                 }
             },
-
         }
     };
     return config;
