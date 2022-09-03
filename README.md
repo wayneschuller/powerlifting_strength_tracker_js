@@ -1,5 +1,5 @@
 # powerlifting_strength_tracker_js
-A javascript based strength lifting visualiser 
+## A javascript based strength history visualiser 
 
 Click here to use the deployed version: https://wayneschuller.github.io/powerlifting_strength_tracker_js/e1rm.html
 You can then click on the file chooser to select a CSV file of your lifts.
