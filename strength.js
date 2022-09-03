@@ -157,8 +157,23 @@ function rewardStar (date, weight, style, border, background, datasetIndex) {
                     // return true;
                 },
                 // scaleID: 'y',
-            };
 
+                /*
+                label: {
+                    display: true,
+                    content: {
+                        src: 'https://cdn0.iconfinder.com/data/icons/google-material-design-3-0/48/ic_book_48px-256.png',
+                        height: 25,
+                        width: 25
+                    },
+                    backgroundColor: 'white',
+                    borderWidth: 3,
+                    width: '20%',
+                    height: '20%',
+                    position: 'end'
+                }
+                */
+            };
 }
 
 // array function to gather interesting achievements from processedData
@@ -175,6 +190,11 @@ function visualiseAchievements(e, index) {
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
         e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 1RM of all time!`;
+
+        // TESTING experimental annotations here
+        // liftAnnotations[`${e.name}_special1RM`] = {
+
+        // };
     }
 
     if (e.best3RM) {
@@ -190,7 +210,7 @@ function visualiseAchievements(e, index) {
     if (e.best5RM) {
         // Set point annotation for .best5RM
         let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
-        liftAnnotations[`${e.name}_best_5RM`] = rewardStar(e.best5RM.date, e1rm, 'circle', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_5RM`] = rewardStar(e.best5RM.date, e1rm, 'square', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
@@ -427,7 +447,7 @@ function getChartConfig () {
                 legend: {
                     labels: {
                         font: {
-                            size:16
+                            size:20
                         }
                     }
                 }
@@ -444,7 +464,7 @@ function getChartConfig () {
                 },
                 yAxis: {
                     suggestedMin: 50, 
-                    suggestedMax: 225
+                    suggestedMax: 225,
                 }
             },
 
