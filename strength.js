@@ -189,7 +189,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
-        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 1RM of all time!`;
+        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
 
         // TESTING experimental annotations here
         // liftAnnotations[`${e.name}_special1RM`] = {
@@ -204,7 +204,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
-        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 3RM of all time!`;
+        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 3RM of all time!`;
     }
 
     if (e.best5RM) {
@@ -214,7 +214,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
-        e.graphData[dateIndex].label = e.graphData[dateIndex].label + ` Best ${e.name} 5RM of all time!`;
+        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 5RM of all time!`;
     };
 }
 
