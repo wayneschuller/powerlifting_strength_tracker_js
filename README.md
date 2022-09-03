@@ -1,6 +1,7 @@
 # powerlifting_strength_tracker_js
 A javascript based powerlifting graph tracker (processes data from Beyond the Whiteboard and Barbell Logic)
 
+Click here to use the deployed version: [https://wayneschuller.github.io/powerlifting_strength_tracker_js/e1rm.html]
 Download the e1rm.html and strength.js into the same folder and open e1rm.html in your web browser.
 
 You can then click on the file chooser to select a CSV file of your lifts.
