@@ -422,7 +422,7 @@ function getChartConfig () {
                     formatter: function(context) {
                         return context.y; 
                         },
-                    font: { weight: 'bold'},
+                    // font: { weight: 'bold'},
                     align: 'end',
                     anchor: 'end',
                 },
