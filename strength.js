@@ -1,11 +1,11 @@
 // Global variables
-let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL;
+let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL;
 
 const rawLiftData = []; // Array of lift objects
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
-let numGraphLines = 4; // How many lifts to show by default (FIXME: make configurable)
+let numChartLines = 4; // How many lifts to show by default (FIXME: make configurable)
 let padDateMin, padDateMax;
 
 function readCSV () {
@@ -28,6 +28,7 @@ function readCSV () {
                 actual_reps_COL = columnNames.indexOf("actual_reps");
                 actual_weight_COL = columnNames.indexOf("actual_weight");
                 missed_COL = columnNames.indexOf("assigned_exercise_missed");
+                units_COL = columnNames.indexOf("weight_units");
                 data.data.forEach(parseBlocRow);
 
             } else if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
@@ -149,11 +150,11 @@ function createAchievement(date, weight, text, border, background, datasetIndex)
 
     return {
             type: 'label',
-            borderColor: (ctx) => ctx.chart.data.datasets[0].backgroundColor,
-            borderRadius: 6,
-            borderWidth: 1,
-            yAdjust: 25, 
-            content: [`\ue7af ${text}`],
+            borderColor: (ctx) => ctx.chart.data.datasets[datasetIndex].backgroundColor,
+            borderRadius: 3,
+            borderWidth: 2,
+            yAdjust: 20, 
+            content: [text],
             xValue: date,
             yValue: weight,
             backgroundColor: background,
@@ -164,10 +165,10 @@ function createAchievement(date, weight, text, border, background, datasetIndex)
                 bottom: 1,
             },
             display(chart, options) {
-                    // Only show if dataset line is visible on chart 
-                    let meta = chart.chart.getDatasetMeta(datasetIndex);
-                    if (meta === undefined) return false;
-                    return meta.visible;
+                // Only show if dataset line is visible on chart 
+                let meta = chart.chart.getDatasetMeta(datasetIndex);
+                if (meta === undefined) return false;
+                return meta.visible;
                 },
                 // scaleID: 'y',
             };
@@ -176,9 +177,11 @@ function createAchievement(date, weight, text, border, background, datasetIndex)
 // array function to gather interesting achievements from processedData
 function visualiseAchievements(e, index) {
 
-    // console.log(`collecting achievements for ${e.name} (index: ${index})`);
+    if (index >= numChartLines) return; // We can only draw annotations where we have made lines
 
     if (!e) return;
+
+    console.log(`collecting achievements for ${e.name} (index: ${index})`);
 
     if (e.best1RM) {
         // Set point annotation for .best1RM
@@ -187,6 +190,24 @@ function visualiseAchievements(e, index) {
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
         e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
+
+        /* 
+        // Put a google medal icon next to the 1RM achivement annotation
+        liftAnnotations[`${e.name}_trophy_1RM`] = {
+            type: 'label',
+            xAdjust: -25, 
+            yAdjust: 25, 
+            content: [`\ue7af`],
+            xValue: e.best1RM.date,
+            yValue: e.best1RM.weight,
+            //backgroundColor: background,
+            font: { 
+                family: 'Material Symbols Outlined',
+                size: 30,
+            },
+            // scaleID: 'y',
+        };
+        */
     }
 
     if (e.best3RM) {
@@ -210,7 +231,7 @@ function visualiseAchievements(e, index) {
     };
 }
 
-// Load the BLOC data as a liftEntry object into rawLiftData
+// Parse a row of BTWB data as a liftEntry object into rawLiftData
 function parseBtwbRow(row) {
 
     // console.log(`parseBtwbRow: ${JSON.stringify(row)}`);
@@ -297,7 +318,7 @@ function parseBlocRow(row) {
         date: row[workout_date_COL],
         reps: lifted_reps,
         weight: lifted_weight,
-        // FIXME: add units here
+        units: row[units_COL],
     }
     rawLiftData.push(liftEntry); // add to our collection of raw data
 }
@@ -332,7 +353,7 @@ function getChartConfig () {
 
     // Make line config datasets of the most popular lift types
     let dataSets = [];
-    for (let i = 0; i < numGraphLines; i++) {
+    for (let i = 0; i < numChartLines; i++) {
 
         // Check if we have this data to chart, then push it on
         if (processedData[i] && processedData[i].name && processedData[i].graphData)
