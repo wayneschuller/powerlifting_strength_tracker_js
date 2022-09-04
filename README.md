@@ -10,7 +10,7 @@ Currently supported CSV formats:
 - more file formats coming soon including a DIY format
 
 The code will use charts.js to generate a time based graph of your lifts based on an estimated one rep max:
-![strength_tracker_sample](https://user-images.githubusercontent.com/1592295/186638017-abfefe15-9aba-4778-93e8-ea27c016ff09.jpg)
+![20220904_squat](https://user-images.githubusercontent.com/1592295/188308389-69f136b0-9e68-45b7-bac0-60fda94a9e06.png)
 
 You can compare relative progress for different rep ranges of the same lift. If you hover the mouse over a data point it will show which reps and weight produced that estimated data point.
 
