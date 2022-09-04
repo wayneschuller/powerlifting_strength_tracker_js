@@ -440,8 +440,13 @@ function getChartConfig () {
                     formatter: function(context) {
                         return context.y; 
                         },
-                    font: { 
-                        // family: 'Times'
+                    font: function(context) {
+                        // Mark heavy singles in bold data labels, and the e1rm estimate data labels as italic
+                        let liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
+                        if (liftSingle === -1) 
+                            return { weight: 'bold', size: 13, };
+                        else 
+                            return { style: 'italic', size: 12, };
                     },
                     align: 'end',
                     anchor: 'end',
