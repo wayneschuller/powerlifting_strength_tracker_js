@@ -145,44 +145,31 @@ function processRawLiftData() {
 
 
 // Generate annotation config for an achievement
-function rewardStar (date, weight, style, border, background, datasetIndex) {
+function createAchievement(date, weight, text, border, background, datasetIndex) {
 
     return {
-                type: 'point',
-                pointStyle: style,
-                radius: 15,
-                borderWidth: 3,
-                borderColor: border,
-                drawTime: 'afterDraw',
-                xValue: date,
-                yValue: weight,
-                backgroundColor: background,
-                display(chart, options) {
-                    // your logic, for instance the annoatation is shown 
-                    // only if a dataset (in this case the first one) is not hidden
-                    // console.log(`chart passed: ${chart}`);
+            type: 'label',
+            borderColor: (ctx) => ctx.chart.data.datasets[0].backgroundColor,
+            borderRadius: 6,
+            borderWidth: 1,
+            yAdjust: 25, 
+            content: [`\ue7af ${text}`],
+            xValue: date,
+            yValue: weight,
+            backgroundColor: background,
+            padding: {
+                top: 2,
+                left: 2,
+                right: 2,
+                bottom: 1,
+            },
+            display(chart, options) {
+                    // Only show if dataset line is visible on chart 
                     let meta = chart.chart.getDatasetMeta(datasetIndex);
                     if (meta === undefined) return false;
                     return meta.visible;
-                    // return true;
                 },
                 // scaleID: 'y',
-
-                /*
-                label: {
-                    display: true,
-                    content: {
-                        src: 'https://cdn0.iconfinder.com/data/icons/google-material-design-3-0/48/ic_book_48px-256.png',
-                        height: 25,
-                        width: 25
-                    },
-                    backgroundColor: 'white',
-                    borderWidth: 3,
-                    width: '20%',
-                    height: '20%',
-                    position: 'end'
-                }
-                */
             };
 }
 
@@ -195,22 +182,17 @@ function visualiseAchievements(e, index) {
 
     if (e.best1RM) {
         // Set point annotation for .best1RM
-        liftAnnotations[`${e.name}_best_1RM`] = rewardStar(e.best1RM.date, e.best1RM.weight, 'star', 'gold', 'rgba(255, 99, 132, 0.25)', index);
+        liftAnnotations[`${e.name}_best_1RM`] = createAchievement(e.best1RM.date, e.best1RM.weight, '1RM', 'gold', 'rgba(255, 99, 132, 0.25)', index);
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
         e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
-
-        // TESTING experimental annotations here
-        // liftAnnotations[`${e.name}_special1RM`] = {
-
-        // };
     }
 
     if (e.best3RM) {
         // Set point annotation for .best3RM
         let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
-        liftAnnotations[`${e.name}_best_3RM`] = rewardStar(e.best3RM.date, e1rm, 'triangle', 'brown', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_3RM`] = createAchievement(e.best3RM.date, e1rm, '3RM', 'brown', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
@@ -220,7 +202,7 @@ function visualiseAchievements(e, index) {
     if (e.best5RM) {
         // Set point annotation for .best5RM
         let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
-        liftAnnotations[`${e.name}_best_5RM`] = rewardStar(e.best5RM.date, e1rm, 'square', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_5RM`] = createAchievement(e.best5RM.date, e1rm, '5RM', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
@@ -416,7 +398,7 @@ function getChartConfig () {
     };
 
 
-    Chart.defaults.font.family = 'Oswald';
+    Chart.defaults.font.family = 'Catamaran';
 
     const config = {
         type: 'line',
@@ -433,7 +415,9 @@ function getChartConfig () {
                     formatter: function(context) {
                         return context.y; 
                         },
-                    font: { weight: 'bold'},
+                    font: { 
+                        // family: 'Times'
+                    },
                     align: 'end',
                     anchor: 'end',
                 },
