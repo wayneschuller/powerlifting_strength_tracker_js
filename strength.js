@@ -138,7 +138,7 @@ function processRawLiftData() {
 
     // Use the most popular lift to set some x-axis padding at start and end
     padDateMin = new Date(processedData[0].graphData[0].x); 
-    padDateMin = padDateMin.setDate(padDateMin.getDate() - 14);
+    padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
     padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
     padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 }
@@ -416,7 +416,7 @@ function getChartConfig () {
     };
 
 
-    Chart.defaults.font.family = 'Lato';
+    Chart.defaults.font.family = 'Oswald';
 
     const config = {
         type: 'line',
@@ -433,7 +433,7 @@ function getChartConfig () {
                     formatter: function(context) {
                         return context.y; 
                         },
-                    //font: { weight: 'bold'},
+                    font: { weight: 'bold'},
                     align: 'end',
                     anchor: 'end',
                 },
