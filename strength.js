@@ -5,7 +5,7 @@ const rawLiftData = []; // Array of lift objects
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
-let numChartLines = 4; // How many lifts to show by default (FIXME: make configurable)
+let numChartLines = 4; // How many lifts to show by default (FIXME: make configurable in the html)
 let padDateMin, padDateMax;
 
 function readCSV () {
@@ -123,8 +123,6 @@ function processRawLiftData() {
                 processedData[liftIndex].graphData[dateIndex].label = label;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
-
-        
     }
 
     console.log(`We now have ${processedData.length} types of lifts`);
@@ -484,9 +482,7 @@ function getChartConfig () {
                     },
                 },
                 yAxis: {
-                    // FIXME: these should be dynamically adjusted for unit type: imperial or metric
-                    suggestedMin: 50, 
-                    suggestedMax: 225,
+                    suggestedMin: 0, 
                     ticks: {
                         font: {size: 15},
                     },
