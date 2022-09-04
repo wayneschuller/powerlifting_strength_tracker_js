@@ -106,9 +106,9 @@ function processRawLiftData() {
         // Prepare our data label
         let label = '';
         if (rawLiftData[i].reps === 1)
-            label = `Lifted 1@${rawLiftData[i].weight}kg.`;
+            label = `Lifted 1@${rawLiftData[i].weight}${rawLiftData[i].units}.`;
         else
-            label = `Potential 1@${oneRepMax}kg from ${rawLiftData[i].reps}@${rawLiftData[i].weight}kg.`;
+            label = `Potential 1@${oneRepMax}${rawLiftData[i].units} from ${rawLiftData[i].reps}@${rawLiftData[i].weight}${rawLiftData[i].units}.`;
 
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
@@ -263,8 +263,14 @@ function parseBtwbRow(row) {
         let curReps = parseInt(result[0]);
         if (curReps == 0) continue; // FIXME: check why this would happen
 
-        // Get weight
-        regex = /[0-9|\.]+\skg$/gm; 
+        // Get units then weight
+        let units = "kg";
+        if (lift.indexOf("kg") != -1) {
+            regex = /[0-9|\.]+\skg$/gm; 
+        } else  {
+            units = "lb";
+            regex = /[0-9|\.]+\slb$/gm; 
+        }
         result = regex.exec(lift);
         if (!result) continue;
         let curWeight = parseInt(result[0].slice(0, result[0].length-2)); // Remove the kg off the end
@@ -275,7 +281,7 @@ function parseBtwbRow(row) {
             date: row[workout_date_COL],
             reps: curReps,
             weight: curWeight,
-            // FIXME: add units here
+            units: units,
         }
 
         rawLiftData.push(liftEntry); // add to our collection of raw data
