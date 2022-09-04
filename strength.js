@@ -6,6 +6,7 @@ const processedData = []; // Array with one element per lift type of charts.js g
 const liftAnnotations = {}; 
 let myChart; 
 let numGraphLines = 4; // How many lifts to show by default (FIXME: make configurable)
+let padDateMin, padDateMax;
 
 function readCSV () {
     let reader = new FileReader; 
@@ -53,8 +54,6 @@ function readCSV () {
             }
             // Process achievements and display them after creation
             processedData.forEach(visualiseAchievements);
-
-            // FIXME: Find max and min after creation and add one weeks padding
             myChart.update();
 
     }
@@ -137,6 +136,11 @@ function processRawLiftData() {
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
+    // Use the most popular lift to set some x-axis padding at start and end
+    padDateMin = new Date(processedData[0].graphData[0].x); 
+    padDateMin = padDateMin.setDate(padDateMin.getDate() - 14);
+    padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
+    padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 }
 
 
@@ -462,8 +466,8 @@ function getChartConfig () {
             scales: {
                 xAxis: {
                     type: 'time',
-                    // suggestedMin: '2021-06-01',
-                    // suggestedMax: '2022-09-10',
+                    suggestedMin: padDateMin,
+                    suggestedMax: padDateMax,
                     time: {
                         minUnit: 'day',
                     },
