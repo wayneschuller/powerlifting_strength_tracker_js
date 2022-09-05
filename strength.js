@@ -407,22 +407,6 @@ function getChartConfig () {
         }
     }
 
-    let delayed;
-
-    const animationOptions = {
-        onComplete: () => {
-            delayed = true;
-        },
-        delay: (context) => {
-            let delay = 0;
-            if (context.type === 'data' && context.mode === 'default' && !delayed) {
-                delay = context.dataIndex * 8000;
-                }
-            return delay;
-            }
-    };
-
-
     Chart.defaults.font.family = 'Catamaran';
 
     const config = {
@@ -430,7 +414,6 @@ function getChartConfig () {
         plugins: [ChartDataLabels],
         data: data,
         options: {
-            // animations: animationOptions,
             plugins: {
                 zoom: zoomOptions,
                 annotation: {
