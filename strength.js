@@ -1,5 +1,5 @@
 // Global variables
-let workout_date_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL;
+let workout_date_COL, workout_id_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL;
 
 const rawLiftData = []; // Array of lift objects
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
@@ -22,6 +22,7 @@ function readCSV () {
                 // console.log("this is bloc data CSV");
                 // Here are the essential BLOC column names from their CSV export as of 2022
                 workout_date_COL = columnNames.indexOf("workout_date");
+                workout_id_COL = columnNames.indexOf("workout_id");
                 completed_COL = columnNames.indexOf("workout_completed");
                 exercise_name_COL = columnNames.indexOf("exercise_name");
                 assigned_reps_COL = columnNames.indexOf("assigned_reps");
@@ -57,7 +58,6 @@ function readCSV () {
             // Process achievements and display them after creation
             processedData.forEach(visualiseAchievements);
             myChart.update();
-
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -112,14 +112,15 @@ function processRawLiftData() {
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
         if (dateIndex === -1) {
-            // New lift and new date
-            processedData[liftIndex].graphData.push({x:rawLiftData[i].date, y: oneRepMax, label:`${label}`});
+            // Push new lift and new date (in chartjs friendly format)
+            processedData[liftIndex].graphData.push({x:rawLiftData[i].date, y: oneRepMax, label:`${label}`, URL:`${rawLiftData[i].URL}`});
         } else {
             // We already have a lift on this date - keep the stronger one
             if (oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
                 // Better lift, duplicate date
                 processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
                 processedData[liftIndex].graphData[dateIndex].label = label;
+                processedData[liftIndex].graphData[dateIndex].URL = rawLiftData[i].URL;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
     }
@@ -134,7 +135,7 @@ function processRawLiftData() {
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
-    // Use the most popular lift to set some x-axis padding at start and end
+    // Use the most popular lift to set some aesthetic x-axis padding at start and end
     padDateMin = new Date(processedData[0].graphData[0].x); 
     padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
     padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
@@ -187,24 +188,6 @@ function visualiseAchievements(e, index) {
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
         e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
-
-        /* 
-        // Put a google medal icon next to the 1RM achivement annotation
-        liftAnnotations[`${e.name}_trophy_1RM`] = {
-            type: 'label',
-            xAdjust: -25, 
-            yAdjust: 25, 
-            content: [`\ue7af`],
-            xValue: e.best1RM.date,
-            yValue: e.best1RM.weight,
-            //backgroundColor: background,
-            font: { 
-                family: 'Material Symbols Outlined',
-                size: 30,
-            },
-            // scaleID: 'y',
-        };
-        */
     }
 
     if (e.best3RM) {
@@ -319,11 +302,14 @@ function parseBlocRow(row) {
 
     unitType = row[units_COL]; // Record the units type global for later. (we assume it won't change in the CSV)
 
+    let liftURL = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
+
     let liftEntry = {
         name: row[exercise_name_COL],
         date: row[workout_date_COL],
         reps: lifted_reps,
         weight: lifted_weight,
+        URL: liftURL,
     }
     rawLiftData.push(liftEntry); // add to our collection of raw data
 }
@@ -354,7 +340,7 @@ function estimateE1RM(reps, weight) {
 // Setup a charts.js chart.
 function getChartConfig () {
 
-    colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(100, 100, 0)', 'rgb(0, 100, 100)'];
+    colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(50, 150, 150)', 'rgb(100, 100, 0)'];
 
     // Make line config datasets of the most popular lift types
     let dataSets = [];
@@ -415,6 +401,7 @@ function getChartConfig () {
         plugins: [ChartDataLabels],
         data: data,
         options: {
+            onClick: onClickHandler,
             plugins: {
                 zoom: zoomOptions,
                 annotation: {
@@ -483,6 +470,14 @@ function getChartConfig () {
         },
     };
     return config;
+}
+
+function onClickHandler (event, item) {
+    if (item && item.length > 0) {
+        // console.log(`You clicked this point: ${JSON.stringify(processedData[item[0].datasetIndex].graphData[item[0].index])}`)
+        let URL = processedData[item[0].datasetIndex].graphData[item[0].index].URL;
+        if (URL) window.open(URL);
+    }
 }
 
 function resetZoom () {
