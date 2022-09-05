@@ -7,6 +7,7 @@ const liftAnnotations = {};
 let myChart; 
 let numChartLines = 4; // How many lifts to show by default (FIXME: make configurable in the html)
 let padDateMin, padDateMax;
+let unitType = "lb"; // Default to freedom units
 
 function readCSV () {
     let reader = new FileReader; 
@@ -82,8 +83,6 @@ function processRawLiftData() {
         liftIndex = processedData.push(processedLiftType) - 1; 
         } 
 
-        // Side task - collect the first and last date of lift data (used for chart boundaries)
-
         // Side task - collect some achievements for this lift type
         switch (rawLiftData[i].reps) {
             case 5:
@@ -106,9 +105,9 @@ function processRawLiftData() {
         // Prepare our data label
         let label = '';
         if (rawLiftData[i].reps === 1)
-            label = `Lifted 1@${rawLiftData[i].weight}${rawLiftData[i].units}.`;
+            label = `Lifted 1@${rawLiftData[i].weight}${unitType}.`;
         else
-            label = `Potential 1@${oneRepMax}${rawLiftData[i].units} from ${rawLiftData[i].reps}@${rawLiftData[i].weight}${rawLiftData[i].units}.`;
+            label = `Potential 1@${oneRepMax}${unitType} from ${rawLiftData[i].reps}@${rawLiftData[i].weight}${unitType}.`;
 
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
@@ -262,16 +261,17 @@ function parseBtwbRow(row) {
         if (curReps == 0) continue; // FIXME: check why this would happen
 
         // Get units then weight
-        let units = "kg";
         if (lift.indexOf("kg") != -1) {
+            unitType = "kg";
             regex = /[0-9|\.]+\skg$/gm; 
-        } else  {
-            units = "lb";
+        } else if (lift.indexOf("lb") != -1) {
+            unitType = "lb";
             regex = /[0-9|\.]+\slb$/gm; 
-        }
+        } else continue; // We can't find units so it's probably not a lift 
+
         result = regex.exec(lift);
         if (!result) continue;
-        let curWeight = parseInt(result[0].slice(0, result[0].length-2)); // Remove the kg off the end
+        let curWeight = parseInt(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
         if (curWeight == 0) continue;
         
         let liftEntry = {
@@ -279,7 +279,7 @@ function parseBtwbRow(row) {
             date: row[workout_date_COL],
             reps: curReps,
             weight: curWeight,
-            units: units,
+            units: unitType, 
         }
 
         rawLiftData.push(liftEntry); // add to our collection of raw data
@@ -317,12 +317,13 @@ function parseBlocRow(row) {
    
     if (lifted_reps === 0 || lifted_weight === 0) return;
 
+    unitType = row[units_COL]; // Record the units type global for later. (we assume it won't change in the CSV)
+
     let liftEntry = {
         name: row[exercise_name_COL],
         date: row[workout_date_COL],
         reps: lifted_reps,
         weight: lifted_weight,
-        units: row[units_COL],
     }
     rawLiftData.push(liftEntry); // add to our collection of raw data
 }
@@ -473,10 +474,13 @@ function getChartConfig () {
                     suggestedMin: 0, 
                     ticks: {
                         font: {size: 15},
+                        callback: function (value) {
+                            return value + unitType;
+                        },
                     },
-                }
+                },
             },
-        }
+        },
     };
     return config;
 }
