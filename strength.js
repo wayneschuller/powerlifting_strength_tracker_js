@@ -144,7 +144,7 @@ function processRawLiftData() {
 
 
 // Generate annotation config for an achievement
-function createAchievement(date, weight, text, border, background, datasetIndex) {
+function createAchievement(date, weight, text, background, datasetIndex) {
 
     return {
             type: 'label',
@@ -183,7 +183,7 @@ function visualiseAchievements(e, index) {
 
     if (e.best1RM) {
         // Set point annotation for .best1RM
-        liftAnnotations[`${e.name}_best_1RM`] = createAchievement(e.best1RM.date, e.best1RM.weight, '1RM', 'gold', 'rgba(255, 99, 132, 0.25)', index);
+        liftAnnotations[`${e.name}_best_1RM`] = createAchievement(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
@@ -193,7 +193,7 @@ function visualiseAchievements(e, index) {
     if (e.best3RM) {
         // Set point annotation for .best3RM
         let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
-        liftAnnotations[`${e.name}_best_3RM`] = createAchievement(e.best3RM.date, e1rm, '3RM', 'brown', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_3RM`] = createAchievement(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
@@ -203,7 +203,7 @@ function visualiseAchievements(e, index) {
     if (e.best5RM) {
         // Set point annotation for .best5RM
         let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
-        liftAnnotations[`${e.name}_best_5RM`] = createAchievement(e.best5RM.date, e1rm, '5RM', 'bronze', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_5RM`] = createAchievement(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
