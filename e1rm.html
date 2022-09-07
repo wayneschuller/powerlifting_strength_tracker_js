@@ -23,33 +23,49 @@
 
     <p>Visualise your lift history using a <a href="https://en.wikipedia.org/wiki/One-repetition_maximum">1 rep max estimate</a> for different 
     repetition variations to track progress over time. 
-    Currently using <a href="https://en.wikipedia.org/wiki/One-repetition_maximum#Brzycki">Brzycki formula</a> 
-    but this will be configurable in the future.</p>
 
     <div class="chartCard">
         <div class="chartBox">
             <div>
                 <canvas id="myChartCanvas"></canvas>
             </div>
-            <div id="resetDiv">
-                <button id="reset" type="button">Reset Zoom</button>
-            </div>
+
+            <div class="chartControlsBox">
+
+                <div class="dropup">
+                    <button class="dropbtn" id="equationButton">Choose 1RM Equation</button>
+                    <div class="dropup-content">
+                        <a id="Brzycki">Brzycki</a>
+                        <a id="Epley">Epley</a>
+                        <a id="Wathen">Wathen</a>
+                    </div>
+                </div>
+                <div style="float:right;">
+                    <button id="reset" type="button">Reset Zoom</button> 
+                </div>
+            </div> 
     </div>
     </div>
 
     <p>Select local CSV File: <input id="fileUploadButton" type="file" multiple> 
-        (supported formats include <a href="https://barbell-logic.com/">BLOC client app</a> and <a href="https://beyondthewhiteboard.com/">BTWB</a>)
+        (supported CSV formats include <a href="https://barbell-logic.com/">BLOC client app</a> and <a href="https://beyondthewhiteboard.com/">BTWB</a>)
+
 
     <script>
         var fileInput = document.getElementById("fileUploadButton");
         fileInput.addEventListener('change', readCSV);
-    </script>
 
-
-
-    <script>
         var resetInput = document.getElementById("reset");
         resetInput.addEventListener('click', resetZoom);
+
+        var equationInput = document.getElementById("Brzycki");
+        equationInput.addEventListener('click', equationBrzycki);
+
+        var equationInput = document.getElementById("Epley");
+        equationInput.addEventListener('click', equationEpley);
+
+        var equationInput = document.getElementById("Wathen");
+        equationInput.addEventListener('click', equationWathen);
     </script>
 
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>

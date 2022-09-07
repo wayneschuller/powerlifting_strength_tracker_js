@@ -46,7 +46,7 @@ function readCSV () {
 
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure
-            processRawLiftData();
+            processRawLiftData("Brzycki");
 
             // Draw or update the chart now we have data.
             if (myChart) {
@@ -56,7 +56,7 @@ function readCSV () {
                 myChart = new Chart(canvas, getChartConfig());
             }
             // Process achievements and display them after creation
-            processedData.forEach(visualiseAchievements);
+            processedData.forEach(visualiseAchievements, "Brzycki");
             myChart.update();
     }
 
@@ -66,7 +66,8 @@ function readCSV () {
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
 // We also use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
-function processRawLiftData() {
+// Passed an string argument for equation - matching those in estimateE1RM() function.
+function processRawLiftData(equation) {
 
     for (let i = 0; i < rawLiftData.length; i++) {
 
@@ -100,7 +101,7 @@ function processRawLiftData() {
         }
         
         // Main task - find the best e1rm estimate on this date
-        let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight);
+        let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight, equation);
 
         // Prepare our data label
         let label = '';
@@ -112,15 +113,22 @@ function processRawLiftData() {
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
         if (dateIndex === -1) {
-            // Push new lift and new date (in chartjs friendly format)
-            processedData[liftIndex].graphData.push({x:rawLiftData[i].date, y: oneRepMax, label:`${label}`, URL:`${rawLiftData[i].URL}`});
+            // Push new lift on this new date (in chartjs friendly format)
+            processedData[liftIndex].graphData.push(
+                {   
+                    x:rawLiftData[i].date, 
+                    y: oneRepMax, 
+                    label:`${label}`, 
+                    URL:`${rawLiftData[i].URL}`,
+                    method: `${equation}`,
+                });
         } else {
-            // We already have a lift on this date - keep the stronger one
-            if (oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
-                // Better lift, duplicate date
+            // Update old lift if we are changing equation OR the e1RM is bigger
+            if (processedData[liftIndex].graphData[dateIndex].method != equation || oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
                 processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
                 processedData[liftIndex].graphData[dateIndex].label = label;
                 processedData[liftIndex].graphData[dateIndex].URL = rawLiftData[i].URL;
+                processedData[liftIndex].graphData[dateIndex].method = equation;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
     }
@@ -173,11 +181,14 @@ function createAchievement(date, weight, text, background, datasetIndex) {
 }
 
 // array function to gather interesting achievements from processedData
+// called as a foreach method with an extra argument string for equation type
 function visualiseAchievements(e, index) {
 
     if (index >= numChartLines) return; // We can only draw annotations where we have made lines
 
     if (!e) return;
+
+    equation = this.valueOf(); 
 
     console.log(`collecting achievements for ${e.name} (index: ${index})`);
 
@@ -192,7 +203,7 @@ function visualiseAchievements(e, index) {
 
     if (e.best3RM) {
         // Set point annotation for .best3RM
-        let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
+        let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight, equation);
         liftAnnotations[`${e.name}_best_3RM`] = createAchievement(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
@@ -202,7 +213,7 @@ function visualiseAchievements(e, index) {
 
     if (e.best5RM) {
         // Set point annotation for .best5RM
-        let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
+        let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight, equation);
         liftAnnotations[`${e.name}_best_5RM`] = createAchievement(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
@@ -316,18 +327,25 @@ function parseBlocRow(row) {
 
 // Return a rounded 1 rep max
 // For theory see: https://en.wikipedia.org/wiki/One-repetition_maximum 
-// Later on we can add different methods
-// We really only need a method that works for 1-10 reps.
-function estimateE1RM(reps, weight) {
+function estimateE1RM(reps, weight, equation) {
     if (reps == 0) {
             console.error("Somebody passed 0 reps... naughty.");
             return 0;
     }
+
     if (reps == 1) return parseInt(weight); // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
 
-
-    //return Math.round(weight*(1+reps/30)); // Epley formula
-    return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula
+    switch (equation) {
+        case "Epley":
+            return Math.round(weight*(1+reps/30)); 
+            break;
+        case "Wathen":
+            return Math.round(100 * weight/(48.8+53.8*(Math.pow(Math.E, -0.075*reps)))); 
+            break;
+        default:
+            return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula
+            break;
+    }
 }
 
 function value(ctx, datasetIndex, index, prop) {
@@ -402,7 +420,7 @@ function getChartConfig () {
         plugins: [ChartDataLabels],
         data: data,
         options: {
-            onClick: onClickHandler,
+            onClick: chartClickHandler,
             plugins: {
                 zoom: zoomOptions,
                 annotation: {
@@ -475,7 +493,8 @@ function getChartConfig () {
     return config;
 }
 
-function onClickHandler (event, item) {
+// Used to detect a click on a graph point and open URL in the data.
+function chartClickHandler (event, item) {
     if (item && item.length > 0) {
         // console.log(`You clicked this point: ${JSON.stringify(processedData[item[0].datasetIndex].graphData[item[0].index])}`)
         let URL = processedData[item[0].datasetIndex].graphData[item[0].index].URL;
@@ -485,4 +504,27 @@ function onClickHandler (event, item) {
 
 function resetZoom () {
     if (myChart) myChart.resetZoom();
+}
+
+
+// Callback handlers for equation dropup menu
+function equationBrzycki () {
+    console.log(`Choose Brzycki`);
+    processRawLiftData("Brzycki");
+    processedData.forEach(visualiseAchievements, "Brzycki");
+    myChart.update();
+}
+
+function equationEpley () {
+    console.log(`Choose Epley`);
+    processRawLiftData("Epley");
+    processedData.forEach(visualiseAchievements, "Epley");
+    myChart.update();
+}
+
+function equationWathen () {
+    console.log(`Choose Wathen`);
+    processRawLiftData("Wathen");
+    processedData.forEach(visualiseAchievements, "Wathen");
+    myChart.update();
 }
