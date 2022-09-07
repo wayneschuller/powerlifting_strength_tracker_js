@@ -511,12 +511,6 @@ function resetZoom () {
 
 // Callback handlers for equation dropup menu
 function equationBrzycki () {
-
-    // Hide the dropup menu on click
-    let element = document.getElementsByClassName("dropup-content");
-    if (element && element.length > 0) element[0].style.display = "none";
-    if (element && element.length > 0) element[0].style.display = "";
-
     processRawLiftData("Brzycki");
     processedData.forEach(visualiseAchievements, "Brzycki");
     myChart.update();
@@ -524,23 +518,16 @@ function equationBrzycki () {
 }
 
 function equationEpley () {
-
-    // Hide the dropup menu on click
-    let element = document.getElementsByClassName("dropup-content");
-    if (element && element.length > 0) element[0].style.display = "none";
-    if (element && element.length > 0) element[0].style.display = "";
-
     processRawLiftData("Epley");
     processedData.forEach(visualiseAchievements, "Epley");
     myChart.update();
 }
 
 function equationWathen (context) {
-
     // Hide the dropup menu on click
-    let element = document.getElementsByClassName("dropup-content");
-    if (element && element.length > 0) element[0].style.display = "none";
-    if (element && element.length > 0) element[0].style.display = "";
+    // let element = document.getElementsByClassName("dropup-content");
+    // if (element && element.length > 0) element[0].style.display = "none";
+    // if (element && element.length > 0) element[0].style.display = "";
 
     processRawLiftData("Wathen");
     processedData.forEach(visualiseAchievements, "Wathen");
