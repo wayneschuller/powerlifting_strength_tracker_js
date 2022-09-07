@@ -58,6 +58,10 @@ function readCSV () {
             // Process achievements and display them after creation
             processedData.forEach(visualiseAchievements, "Brzycki");
             myChart.update();
+
+            // Now we have the chart show the controls box.
+            let controlsBox = document.getElementById("chartControlsBox");
+            controlsBox.style.visibility = "visible";
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -133,7 +137,7 @@ function processRawLiftData(equation) {
         } 
     }
 
-    console.log(`We now have ${processedData.length} types of lifts`);
+    console.log(`Processed raw data into ${processedData.length} different types of lifts. (${equation} equation)`);
 
     // Every element of processedData now has a graphData array
     // Let's sort each graphData array by date (x entry) so it draws lines correctly
@@ -189,8 +193,6 @@ function visualiseAchievements(e, index) {
     if (!e) return;
 
     equation = this.valueOf(); 
-
-    console.log(`collecting achievements for ${e.name} (index: ${index})`);
 
     if (e.best1RM) {
         // Set point annotation for .best1RM
@@ -509,21 +511,37 @@ function resetZoom () {
 
 // Callback handlers for equation dropup menu
 function equationBrzycki () {
-    console.log(`Choose Brzycki`);
+
+    // Hide the dropup menu on click
+    let element = document.getElementsByClassName("dropup-content");
+    if (element && element.length > 0) element[0].style.display = "none";
+    if (element && element.length > 0) element[0].style.display = "";
+
     processRawLiftData("Brzycki");
     processedData.forEach(visualiseAchievements, "Brzycki");
     myChart.update();
+
 }
 
 function equationEpley () {
-    console.log(`Choose Epley`);
+
+    // Hide the dropup menu on click
+    let element = document.getElementsByClassName("dropup-content");
+    if (element && element.length > 0) element[0].style.display = "none";
+    if (element && element.length > 0) element[0].style.display = "";
+
     processRawLiftData("Epley");
     processedData.forEach(visualiseAchievements, "Epley");
     myChart.update();
 }
 
-function equationWathen () {
-    console.log(`Choose Wathen`);
+function equationWathen (context) {
+
+    // Hide the dropup menu on click
+    let element = document.getElementsByClassName("dropup-content");
+    if (element && element.length > 0) element[0].style.display = "none";
+    if (element && element.length > 0) element[0].style.display = "";
+
     processRawLiftData("Wathen");
     processedData.forEach(visualiseAchievements, "Wathen");
     myChart.update();

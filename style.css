@@ -22,6 +22,7 @@
 
 .chartControlsBox {
     padding: 5px 0px 0px 0px;
+    visibility: hidden;
 }
 
 #resetDiv {
@@ -45,6 +46,7 @@
   z-index: 1;
 }
 
+
 .dropup:checked .dropup-content {
   display: none;
 }
@@ -62,4 +64,4 @@
 }
 
 /* Change color of dropup links on hover */
-.dropup-content a:hover {background-color: #f1f1f1}
+.dropup-content a:hover {background-color: #d1d1d1} 
