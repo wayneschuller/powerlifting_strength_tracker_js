@@ -26,6 +26,17 @@
     Currently using <a href="https://en.wikipedia.org/wiki/One-repetition_maximum#Brzycki">Brzycki formula</a> 
     but this will be configurable in the future.</p>
 
+    <div class="chartCard">
+        <div class="chartBox">
+            <div>
+                <canvas id="myChartCanvas"></canvas>
+            </div>
+            <div id="resetDiv">
+                <button id="reset" type="button">Reset Zoom</button>
+            </div>
+    </div>
+    </div>
+
     <p>Select local CSV File: <input id="fileUploadButton" type="file" multiple> 
         (supported formats include <a href="https://barbell-logic.com/">BLOC client app</a> and <a href="https://beyondthewhiteboard.com/">BTWB</a>)
 
@@ -34,15 +45,8 @@
         fileInput.addEventListener('change', readCSV);
     </script>
 
-    <div class="chartCard">
-    <div class="chartBox">
-            <div>
-                <canvas id="myChartCanvas"></canvas>
-            </div>
-    </div>
-    </div>
 
-    <button id="reset" type="button">Reset Zoom</button>
+
     <script>
         var resetInput = document.getElementById("reset");
         resetInput.addEventListener('click', resetZoom);

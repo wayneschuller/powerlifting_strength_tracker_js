@@ -330,17 +330,18 @@ function estimateE1RM(reps, weight) {
     return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula
 }
 
-    function value(ctx, datasetIndex, index, prop) {
-        const meta = ctx.chart.getDatasetMeta(datasetIndex);
-        // console.log(JSON.stringify(meta));
-        const parsed = meta.controller.getParsed(index);
-        return parsed ? parsed[prop] : NaN;
-    }
+function value(ctx, datasetIndex, index, prop) {
+    const meta = ctx.chart.getDatasetMeta(datasetIndex);
+    // console.log(JSON.stringify(meta));
+    const parsed = meta.controller.getParsed(index);
+    return parsed ? parsed[prop] : NaN;
+}
 
 // Setup a charts.js chart.
 function getChartConfig () {
 
-    colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(50, 150, 150)', 'rgb(100, 100, 0)'];
+    // colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(50, 150, 150)', 'rgb(100, 100, 0)'];
+    colors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
     // Make line config datasets of the most popular lift types
     let dataSets = [];
@@ -352,10 +353,10 @@ function getChartConfig () {
             label: processedData[i].name,
             backgroundColor: colors[i],
             borderColor: 'rgb(50, 50, 50)',
-            borderWidth: 3,
+            borderWidth: 2,
             pointStyle: 'circle',
             radius: 4,
-            hitRadius: 15,
+            hitRadius: 20,
             hoverRadius: 10,
             cubicInterpolationMode: 'monotone',
             data: processedData[i].graphData,
