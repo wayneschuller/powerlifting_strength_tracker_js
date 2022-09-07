@@ -426,6 +426,8 @@ function getChartConfig () {
                 tooltip: {
                     enabled: true,
                     position: 'nearest',
+                    titleFont: { size:14 },
+                    bodyFont: { size:14 },
                     callbacks: {
                         title: function(context) {
                             const d = new Date(context[0].parsed.x)
