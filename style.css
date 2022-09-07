@@ -10,14 +10,14 @@
     height: calc(100vh - 40px);
     background: rgba(205, 206, 204, 0.5);
     display: flex;
-        align-items: center;
-        justify-content: center;
-     }
-    .chartBox {
-        width: 80%;
-        padding: 20px;
-        border-radius: 20px;
-        border: solid 3px rgba(155, 160, 104, 1);
-        background: white;
-    }
+    align-items: center;
+    justify-content: center;
+}
+.chartBox {
+    width: 80%;
+    padding: 20px;
+    border-radius: 20px;
+    border: solid 3px rgba(155, 160, 104, 1);
+    background: white;
+}
 
