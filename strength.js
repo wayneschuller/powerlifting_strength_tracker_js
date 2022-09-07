@@ -341,11 +341,23 @@ function estimateE1RM(reps, weight, equation) {
         case "Epley":
             return Math.round(weight*(1+reps/30)); 
             break;
+        case "McGlothin":
+            return Math.round(100 * weight/(101.3 - 2.67123 * reps)); 
+            break;
+        case "Lombardi":
+            return Math.round(weight*Math.pow(reps, 0.10)); 
+            break;
+        case "Mayhew":
+            return Math.round(100 * weight/(52.2 + 41.9*Math.pow(Math.E, -0.055*reps))); 
+            break;
+        case "OConner":
+            return Math.round(weight*(1 * r/40)); 
+            break;
         case "Wathen":
             return Math.round(100 * weight/(48.8+53.8*(Math.pow(Math.E, -0.075*reps)))); 
             break;
         default:
-            return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula
+            return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula is our default
             break;
     }
 }
@@ -510,6 +522,12 @@ function resetZoom () {
 
 
 // Callback handlers for equation dropup menu
+function equationEpley () {
+    processRawLiftData("Epley");
+    processedData.forEach(visualiseAchievements, "Epley");
+    myChart.update();
+}
+
 function equationBrzycki () {
     processRawLiftData("Brzycki");
     processedData.forEach(visualiseAchievements, "Brzycki");
@@ -517,9 +535,27 @@ function equationBrzycki () {
 
 }
 
-function equationEpley () {
-    processRawLiftData("Epley");
-    processedData.forEach(visualiseAchievements, "Epley");
+function equationMcGlothin () {
+    processRawLiftData("McGlothin");
+    processedData.forEach(visualiseAchievements, "McGlothin");
+    myChart.update();
+}
+
+function equationLombardi () {
+    processRawLiftData("Lombardi");
+    processedData.forEach(visualiseAchievements, "Lombardi");
+    myChart.update();
+}
+
+function equationMayhew () {
+    processRawLiftData("Mayhew");
+    processedData.forEach(visualiseAchievements, "Mayhew");
+    myChart.update();
+}
+
+function equationOConner () {
+    processRawLiftData("OConner");
+    processedData.forEach(visualiseAchievements, "OConner");
     myChart.update();
 }
 

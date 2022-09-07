@@ -35,8 +35,12 @@
                 <div class="dropup">
                     <button class="dropbtn" id="equationButton">Choose 1RM Equation</button>
                     <div class="dropup-content">
-                        <a id="Brzycki">Brzycki</a>
                         <a id="Epley">Epley</a>
+                        <a id="Brzycki">Brzycki</a>
+                        <a id="McGlothin">McGlothin</a>
+                        <a id="Lombardi">Lombardi</a>
+                        <a id="Mayhew">Mayhew et al.</a>
+                        <a id="OConner">O'Conner et al.</a>
                         <a id="Wathen">Wathen</a>
                     </div>
                 </div>
@@ -58,14 +62,27 @@
         var resetInput = document.getElementById("reset");
         resetInput.addEventListener('click', resetZoom);
 
-        var equationInput = document.getElementById("Brzycki");
-        equationInput.addEventListener('click', equationBrzycki);
-
         var equationInput = document.getElementById("Epley");
         equationInput.addEventListener('click', equationEpley);
 
+        var equationInput = document.getElementById("Brzycki");
+        equationInput.addEventListener('click', equationBrzycki);
+
+        var equationInput = document.getElementById("McGlothin");
+        equationInput.addEventListener('click', equationMcGlothin);
+
+        var equationInput = document.getElementById("Lombardi");
+        equationInput.addEventListener('click', equationLombardi);
+
+        var equationInput = document.getElementById("Mayhew");
+        equationInput.addEventListener('click', equationMayhew);
+
+        var equationInput = document.getElementById("OConner");
+        equationInput.addEventListener('click', equationOConner);
+
         var equationInput = document.getElementById("Wathen");
         equationInput.addEventListener('click', equationWathen);
+
     </script>
 
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
