@@ -29,6 +29,10 @@
   float: right;
   padding: 0px 0px 0px 5px;
 }
+.uploadBox {
+  width: 90%;
+  padding: 10px;
+}
 
 #resetDiv {
     text-align: right;

@@ -15,8 +15,6 @@ function readCSV () {
 
             parseCSV(data);
 
-            if (!rawLiftData || rawLiftData === []) return; // Can't do anything with nothing
-
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure
             // Here we always default to Brzycki 1RM estimation equation (user can change in UI later)
@@ -30,13 +28,9 @@ function readCSV () {
             padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
             padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
-            // Draw or update the chart now we have data.
-            if (myChart) {
-                myChart.update();
-            } else {
-                let canvas = document.getElementById('myChartCanvas');
-                myChart = new Chart(canvas, getChartConfig());
-            }
+            let canvas = document.getElementById('myChartCanvas');
+            myChart = new Chart(canvas, getChartConfig());
+
             // Process achievements and display them after creation
             processedData.forEach(visualiseAchievements, "Brzycki");
             myChart.update();
@@ -44,6 +38,10 @@ function readCSV () {
             // Now we have the chart, show the chart controls box.
             let controlsBox = document.getElementById("chartControlsBox");
             controlsBox.style.visibility = "visible";
+
+            // Hide the file upload button now. We could support multiple uploads in the future.
+            let uploadBox = document.getElementById("uploadBox");
+            uploadBox.style.display = "none";
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
