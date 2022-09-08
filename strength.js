@@ -1,5 +1,5 @@
 // Global variables
-let rawLiftData = []; 
+const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
@@ -13,14 +13,14 @@ function readCSV () {
     reader.onload = function () {
             let data = Papa.parse(reader.result, { dynamicTyping: true });
 
-            rawLiftData = parseCSV(data);
+            parseCSV(data);
 
             if (!rawLiftData || rawLiftData === []) return; // Can't do anything with nothing
 
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure
             // Here we always default to Brzycki 1RM estimation equation (user can change in UI later)
-            processRawLiftData(rawLiftData, "Brzycki");
+            processRawLiftData("Brzycki");
             
             // Use the most popular lift to set some aesthetic x-axis padding at start and end
             // Right now only do this once on first csv load.
@@ -53,7 +53,7 @@ function readCSV () {
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
 // We also use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
 // Passed an string argument for equation - matching those in estimateE1RM() function.
-function processRawLiftData(rawLiftData, equation) {
+function processRawLiftData(equation) {
 
     for (let i = 0; i < rawLiftData.length; i++) {
 
@@ -408,44 +408,55 @@ function resetZoom () {
 
 // Callback handlers for equation dropup menu
 function equationEpley () {
-    processRawLiftData(rawLiftData, "Epley");
+    processRawLiftData("Epley");
     processedData.forEach(visualiseAchievements, "Epley");
     myChart.update();
 }
 
 function equationBrzycki () {
-    processRawLiftData(rawLiftData, "Brzycki");
+    processRawLiftData("Brzycki");
     processedData.forEach(visualiseAchievements, "Brzycki");
     myChart.update();
 
 }
 
 function equationMcGlothin () {
-    processRawLiftData(rawLiftData, "McGlothin");
+    processRawLiftData("McGlothin");
     processedData.forEach(visualiseAchievements, "McGlothin");
     myChart.update();
 }
 
 function equationLombardi () {
-    processRawLiftData(rawLiftData, "Lombardi");
+    processRawLiftData("Lombardi");
     processedData.forEach(visualiseAchievements, "Lombardi");
     myChart.update();
 }
 
 function equationMayhew () {
-    processRawLiftData(rawLiftData, "Mayhew");
+    processRawLiftData("Mayhew");
     processedData.forEach(visualiseAchievements, "Mayhew");
     myChart.update();
 }
 
 function equationOConner () {
-    processRawLiftData(rawLiftData, "OConner");
+    processRawLiftData("OConner");
     processedData.forEach(visualiseAchievements, "OConner");
     myChart.update();
 }
 
 function equationWathen (context) {
-    processRawLiftData(rawLiftData, "Wathen");
+    processRawLiftData("Wathen");
     processedData.forEach(visualiseAchievements, "Wathen");
+    myChart.update();
+}
+
+function toggleAchievements (context) {
+    // processRawLiftData("Wathen");
+    // processedData.forEach(visualiseAchievements, "Wathen");
+    console.log(`toggle achievements`);
+
+    let toggleAchInput = document.getElementById("toggleAchievements");
+    // console.log(toggleAchInput.getParsed());
+
     myChart.update();
 }

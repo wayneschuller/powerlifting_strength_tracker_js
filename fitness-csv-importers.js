@@ -9,7 +9,7 @@ let lastLiftType = "Tik Tok Dancing";
 
 // ----------------------------------------------------------------------
 // parseCSV(data)
-// Determine the CSV data format, parse into a rawLiftData array 
+// Determine the CSV data format, parse into the rawLiftData global
 // ----------------------------------------------------------------------
 function parseCSV(data) {
 
@@ -18,8 +18,6 @@ function parseCSV(data) {
         console.error("Papaparse detected too many errors in file input. Do you even lift?")
         return null;
     }
-
-    let rawLiftData = []; 
 
     let columnNames = data.data[0];
 
@@ -32,7 +30,7 @@ function parseCSV(data) {
         // FIXME: Should we check for missing columns here?
 
         data.data.forEach(parseBtwbRow, rawLiftData);
-        return rawLiftData;
+        return;
     } 
 
     // Look for distinctive BLOC CSV data columns
@@ -53,7 +51,7 @@ function parseCSV(data) {
         // FIXME: Should we check for missing columns here?
 
         data.data.forEach(parseBlocRow, rawLiftData);
-        return rawLiftData;
+        return;
     } 
    
 
@@ -68,22 +66,14 @@ function parseCSV(data) {
     url_COL = columnNames.indexOf("URL");
 
     data.data.forEach(parseBespokeRow, rawLiftData);
-    return rawLiftData;
+    return;
 }
 
 // ---------------------------------------------------------------------------------
 // Array method to parse a row of Bespoke data as a liftEntry object into rawLiftData
-// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
 // Goal is to make this as flexible as possible - it will be our main use case.
 // ---------------------------------------------------------------------------------
 function parseBespokeRow(row, index) {
-
-    /*
-    if (!row || row[0] === null) {
-            // console.log(`parseBlocRow skipping bad row: ${JSON.stringify(row)}`);
-            return; 
-    }
-    */
 
     // console.log(`Bespoke row ${index}: ${JSON.stringify(row)}`);
 
@@ -128,7 +118,22 @@ function parseBespokeRow(row, index) {
     let url = row[url_COL]; if (!url) url = '';
     let notes = row[notes_COL]; if (!notes) notes = '';
 
-    let liftEntry = {
+
+    // Check - do we have this EXACT lift already from another data source?
+    // let matchIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
+    let matchIndex = rawLiftData.findIndex(lift => (lift.date === date && lift.reps === reps && lift.weight === weight));
+    if (matchIndex != -1) {
+        console.log(`Bespoke parse: ${date}: ${liftType} ${reps}@${weight} matched rawLiftdata entry ${matchIndex} (${JSON.stringify(rawLiftData[matchIndex])})`);
+
+        // Keep the existing data, but bespoke url or notes override any previous url/notes.
+        // e.g.: the bespoke URL is likely to be more interesting than the BLOC app URL.
+        if (url != '') rawLiftData[matchIndex].url = url;
+        if (notes != '') rawLiftData[matchIndex].notes = notes;
+        return; 
+    }
+
+    // It's a totally unique lift, push new object onto rawLiftData
+    rawLiftData.push({
         date: date,
         name: liftType,
         reps: reps,
@@ -136,17 +141,13 @@ function parseBespokeRow(row, index) {
         units: unitType, 
         notes: notes,
         url: url,
-    }
+    });
 
     // console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
-
-    rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
-    rawLiftData.push(liftEntry); // add to our collection of raw data
 }
 
 // --------------------------------------------------------------------------------
 // Array method to pass a row of BTWB data as a liftEntry object into rawLiftData
-// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
 // --------------------------------------------------------------------------------
 function parseBtwbRow(row) {
 
@@ -204,7 +205,6 @@ function parseBtwbRow(row) {
             // FIXME: add BTWB notes here
         }
 
-        rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
         rawLiftData.push(liftEntry); // add to our collection of raw data
     }
 }
@@ -212,7 +212,6 @@ function parseBtwbRow(row) {
 
 // ---------------------------------------------------------------------------------
 // Array method to parse a row of BLOC data as a liftEntry object into rawLiftData
-// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
 // ---------------------------------------------------------------------------------
 function parseBlocRow(row) {
 
@@ -249,9 +248,13 @@ function parseBlocRow(row) {
 
     let liftUrl = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
 
+    let liftType = row[exercise_name_COL];
+
+    if (liftType === "Squat") liftType = "Back Squat"; // Our other two data types prefer the full squat type
+
     let liftEntry = {
         date: row[workout_date_COL],
-        name: row[exercise_name_COL],
+        name: liftType,
         reps: lifted_reps,
         weight: lifted_weight,
         url: liftUrl,
@@ -260,20 +263,16 @@ function parseBlocRow(row) {
         // FIXME: any BLOC notes to add?
     }
 
-    rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
     rawLiftData.push(liftEntry); // add to our collection of raw data
 }
 
 // Export the current rawLiftData to the user in a CSV format.
 function exportRawCSV () {
-    console.log(`let's export some raw csv data`);
-
     let csvContent = "data:text/csv;charset=utf-8,";
 
-    csvContent += `Date,"Lift Type",Reps,Weight,Notes,URL` + "\r\n"; // header row
-
+    csvContent += `"Date","Lift Type","Reps","Weight","Notes","URL"` + "\r\n"; // header row
     rawLiftData.forEach(function(lift) {
-        let row = `${lift.date},${lift.name},${lift.reps},${lift.weight}${lift.units},${lift.notes},${lift.url}`;
+        let row = `${lift.date},"${lift.name}",${lift.reps},"${lift.weight}${lift.units}","${lift.notes}","${lift.url}"`;
         csvContent += row + "\r\n";
     });
 
