@@ -1,4 +1,5 @@
 // Global variables
+let rawLiftData = []; 
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
@@ -12,7 +13,9 @@ function readCSV () {
     reader.onload = function () {
             let data = Papa.parse(reader.result, { dynamicTyping: true });
 
-            let rawLiftData = parseCSV(data);
+            rawLiftData = parseCSV(data);
+
+            if (!rawLiftData || rawLiftData === []) return; // Can't do anything with nothing
 
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure
@@ -110,6 +113,9 @@ function processRawLiftData(rawLiftData, equation) {
     }
 
     console.log(`Processed raw data into ${processedData.length} different types of lifts. (${equation} equation)`);
+
+    // Override if a dataset has less than our desired number of chart lines. 
+    if (processedData.length < numChartLines) numChartLines = processedData.length;
 
     // Every element of processedData now has a graphData array
     // Let's sort each graphData array by date (x entry) so it draws lines correctly
@@ -220,7 +226,7 @@ function estimateE1RM(reps, weight, equation) {
             return Math.round(100 * weight/(52.2 + 41.9*Math.pow(Math.E, -0.055*reps))); 
             break;
         case "OConner":
-            return Math.round(weight*(1 * r/40)); 
+            return Math.round(weight*(1 + reps/40)); 
             break;
         case "Wathen":
             return Math.round(100 * weight/(48.8+53.8*(Math.pow(Math.E, -0.075*reps)))); 
@@ -392,49 +398,44 @@ function resetZoom () {
 
 // Callback handlers for equation dropup menu
 function equationEpley () {
-    processRawLiftData("Epley");
+    processRawLiftData(rawLiftData, "Epley");
     processedData.forEach(visualiseAchievements, "Epley");
     myChart.update();
 }
 
 function equationBrzycki () {
-    processRawLiftData("Brzycki");
+    processRawLiftData(rawLiftData, "Brzycki");
     processedData.forEach(visualiseAchievements, "Brzycki");
     myChart.update();
 
 }
 
 function equationMcGlothin () {
-    processRawLiftData("McGlothin");
+    processRawLiftData(rawLiftData, "McGlothin");
     processedData.forEach(visualiseAchievements, "McGlothin");
     myChart.update();
 }
 
 function equationLombardi () {
-    processRawLiftData("Lombardi");
+    processRawLiftData(rawLiftData, "Lombardi");
     processedData.forEach(visualiseAchievements, "Lombardi");
     myChart.update();
 }
 
 function equationMayhew () {
-    processRawLiftData("Mayhew");
+    processRawLiftData(rawLiftData, "Mayhew");
     processedData.forEach(visualiseAchievements, "Mayhew");
     myChart.update();
 }
 
 function equationOConner () {
-    processRawLiftData("OConner");
+    processRawLiftData(rawLiftData, "OConner");
     processedData.forEach(visualiseAchievements, "OConner");
     myChart.update();
 }
 
 function equationWathen (context) {
-    // Hide the dropup menu on click
-    // let element = document.getElementsByClassName("dropup-content");
-    // if (element && element.length > 0) element[0].style.display = "none";
-    // if (element && element.length > 0) element[0].style.display = "";
-
-    processRawLiftData("Wathen");
+    processRawLiftData(rawLiftData, "Wathen");
     processedData.forEach(visualiseAchievements, "Wathen");
     myChart.update();
 }

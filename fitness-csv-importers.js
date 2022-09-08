@@ -2,22 +2,43 @@
 // Wayne Schuller, wayne@schuller.id.au, 2022. GPL3 License.
 
 // Globals (FIXME: remove some time)
-let workout_date_COL, workout_id_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL;
+let workout_date_COL, workout_id_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL, notes_COL, url_COL;
+
+let lastDate = "1999-12-31";
+let lastLiftType = "Tik Tok Dancing"; 
 
 // ----------------------------------------------------------------------
 // parseCSV(data)
-// Determine the data format, parse into a rawLiftData array 
+// Determine the CSV data format, parse into a rawLiftData array 
 // ----------------------------------------------------------------------
 function parseCSV(data) {
+
+    // More than 10 errors might indicate it's a jpg or something non CSV
+    if (data.meta.aborted || data.errors.length > 10) {
+        console.error("Papaparse detected too many errors in file input. Do you even lift?")
+        return null;
+    }
 
     let rawLiftData = []; 
 
     let columnNames = data.data[0];
-    // Detect what kind of CSV file this is based on a sample of test columns in the first row
+
+    // Look for distinctive BTWB CSV data columns - no one else will have a Pukie column
+    if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
+        // Dynamically find where all our needed columns are 
+        workout_date_COL = columnNames.indexOf("Date");
+        description_COL = columnNames.indexOf("Description");
+
+        // FIXME: Should we check for missing columns here?
+
+        data.data.forEach(parseBtwbRow, rawLiftData);
+        return rawLiftData;
+    } 
+
+    // Look for distinctive BLOC CSV data columns
     if (columnNames[0] === "user_name" && columnNames[1] === "workout_id") {
 
-        // console.log("this is bloc data CSV");
-        // Here are the essential BLOC column names from their CSV export as of 2022
+        // Dynamically find where all our needed columns are 
         workout_date_COL = columnNames.indexOf("workout_date");
         workout_id_COL = columnNames.indexOf("workout_id");
         completed_COL = columnNames.indexOf("workout_completed");
@@ -29,24 +50,102 @@ function parseCSV(data) {
         missed_COL = columnNames.indexOf("assigned_exercise_missed");
         units_COL = columnNames.indexOf("weight_units");
 
+        // FIXME: Should we check for missing columns here?
+
         data.data.forEach(parseBlocRow, rawLiftData);
+        return rawLiftData;
+    } 
+   
 
-    } else if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
+    // From here let's just assume it is our bespoke CSV format
+    // FIXME: URL link to public Google Sheet sample
+    console.log(`Hello bespoke`);
+    workout_date_COL = columnNames.indexOf("Date");
+    exercise_name_COL = columnNames.indexOf("Lift Type");
+    actual_reps_COL = columnNames.indexOf("Reps");
+    actual_weight_COL = columnNames.indexOf("Weight");
+    notes_COL = columnNames.indexOf("Notes");
+    url_COL = columnNames.indexOf("URL");
 
-        // console.log("This is BTWB data CSV");
-        workout_date_COL = columnNames.indexOf("Date");
-        description_COL = columnNames.indexOf("Description");
-        data.data.forEach(parseBtwbRow, rawLiftData);
-
-    } else {
-        console.error("Did not detect CSV format. Currently we only process CSV data from Barbell Logic Online Coaching app and Beyond the Whiteboard app");
-    }
-
+    data.data.forEach(parseBespokeRow, rawLiftData);
     return rawLiftData;
 }
-// ----------------------------------------------------------------------
-// Parse a row of BTWB data as a liftEntry object into rawLiftData
-// ----------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------
+// Array method to parse a row of Bespoke data as a liftEntry object into rawLiftData
+// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
+// Goal is to make this as flexible as possible - it will be our main use case.
+// ---------------------------------------------------------------------------------
+function parseBespokeRow(row, index) {
+
+    /*
+    if (!row || row[0] === null) {
+            // console.log(`parseBlocRow skipping bad row: ${JSON.stringify(row)}`);
+            return; 
+    }
+    */
+
+    // console.log(`Bespoke row ${index}: ${JSON.stringify(row)}`);
+
+    if (row[actual_reps_COL] === "Reps") return false; // Probably header row
+
+    let date = row[workout_date_COL];
+    // If date is null we need to use the previous date in the dataset
+    if (date === null) date = lastDate;
+        else lastDate = date; // Remember good date in case we need it in a later row
+
+    let liftType = row[exercise_name_COL];
+    // If lift type is null we need to use the previous lift type
+    if (liftType === null) liftType = lastLiftType;
+        else lastLiftType = liftType; // Remember good life type in case we need it in a later row
+
+    if (!row[actual_reps_COL] || !row[actual_weight_COL]) return false; // Do they even lift?
+
+    let reps = row[actual_reps_COL];
+
+    // Default will be to assume a raw number that is in pounds
+    let weight = row[actual_weight_COL];
+    // Look for units inside the weight string 
+    if (row[actual_weight_COL].indexOf("kg") != -1) {
+
+        unitType = "kg";
+
+        // Convert weight to integer
+        // FIXME: this might lose 0.5kg amounts?
+        weight = parseInt(weight.slice(0, weight.length-2)); // Remove the units from the end
+
+    } else if (row[actual_weight_COL].indexOf("lb") != -1) {
+
+        unitType = "lb";
+
+        // Convert weight to integer
+        weight = parseInt(weight.slice(0, weight.length-2)); // Remove the units from the end
+    } 
+
+    if (reps === 0 || weight === 0) return false; // Do they even lift?
+
+    let liftURL = row[url_COL];
+
+    let liftEntry = {
+        date: date,
+        name: liftType,
+        reps: reps,
+        weight: weight,
+        units: unitType, 
+        notes: row[notes_COL],
+        url: row[url_COL],
+    }
+
+    console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
+
+    rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
+    rawLiftData.push(liftEntry); // add to our collection of raw data
+}
+
+// --------------------------------------------------------------------------------
+// Array method to pass a row of BTWB data as a liftEntry object into rawLiftData
+// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
+// --------------------------------------------------------------------------------
 function parseBtwbRow(row) {
 
     // console.log(`parseBtwbRow: ${JSON.stringify(row)}`);
@@ -93,22 +192,24 @@ function parseBtwbRow(row) {
         if (curWeight == 0) continue;
         
         let liftEntry = {
-            name: liftType,
             date: row[workout_date_COL],
+            name: liftType,
             reps: curReps,
             weight: curWeight,
             units: unitType, 
+            // FIXME: add BTWB notes here
         }
 
-        rLiftData = this.valueOf(); // Grab the extra array that was passed to the function
-        rLiftData.push(liftEntry); // add to our collection of raw data
+        rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
+        rawLiftData.push(liftEntry); // add to our collection of raw data
     }
 }
 
 
-// ----------------------------------------------------------------------
-// Parse a row of BLOC data as a liftEntry object into rawLiftData
-// ----------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
+// Array method to parse a row of BLOC data as a liftEntry object into rawLiftData
+// Pass the destination array as an extra argument: sourceCSV.forEach(parseBtwbRow, rawLiftData);
+// ---------------------------------------------------------------------------------
 function parseBlocRow(row) {
 
     if (!row || row[0] === null) {
@@ -143,13 +244,15 @@ function parseBlocRow(row) {
     let liftURL = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
 
     let liftEntry = {
-        name: row[exercise_name_COL],
         date: row[workout_date_COL],
+        name: row[exercise_name_COL],
         reps: lifted_reps,
         weight: lifted_weight,
         URL: liftURL,
+        units: unitType, 
+        // FIXME: any BLOC notes to add?
     }
 
-    rLiftData = this.valueOf(); // Grab the extra array that was passed to the function
-    rLiftData.push(liftEntry); // add to our collection of raw data
+    rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
+    rawLiftData.push(liftEntry); // add to our collection of raw data
 }
