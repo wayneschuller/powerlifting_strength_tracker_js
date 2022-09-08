@@ -124,7 +124,9 @@ function parseBespokeRow(row, index) {
 
     if (reps === 0 || weight === 0) return false; // Do they even lift?
 
-    let liftURL = row[url_COL];
+    // If we don't have these fields put in empty strings
+    let url = row[url_COL]; if (!url) url = '';
+    let notes = row[notes_COL]; if (!notes) notes = '';
 
     let liftEntry = {
         date: date,
@@ -132,8 +134,8 @@ function parseBespokeRow(row, index) {
         reps: reps,
         weight: weight,
         units: unitType, 
-        notes: row[notes_COL],
-        url: row[url_COL],
+        notes: notes,
+        url: url,
     }
 
     // console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
@@ -197,6 +199,8 @@ function parseBtwbRow(row) {
             reps: curReps,
             weight: curWeight,
             units: unitType, 
+            notes: '',
+            url: '',
             // FIXME: add BTWB notes here
         }
 
@@ -252,9 +256,27 @@ function parseBlocRow(row) {
         weight: lifted_weight,
         url: liftUrl,
         units: unitType, 
+        notes: '',
         // FIXME: any BLOC notes to add?
     }
 
     rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
     rawLiftData.push(liftEntry); // add to our collection of raw data
+}
+
+// Export the current rawLiftData to the user in a CSV format.
+function exportRawCSV () {
+    console.log(`let's export some raw csv data`);
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    csvContent += `Date,"Lift Type",Reps,Weight,Notes,URL` + "\r\n"; // header row
+
+    rawLiftData.forEach(function(lift) {
+        let row = `${lift.date},${lift.name},${lift.reps},${lift.weight}${lift.units},${lift.notes},${lift.url}`;
+        csvContent += row + "\r\n";
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
 }

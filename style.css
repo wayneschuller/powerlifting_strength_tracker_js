@@ -25,6 +25,11 @@
     visibility: hidden;
 }
 
+.rightControls {
+  float: right;
+  padding: 0px 0px 0px 5px;
+}
+
 #resetDiv {
     text-align: right;
 }

@@ -45,8 +45,11 @@
                         <a id="Wathen">Wathen</a>
                     </div>
                 </div>
-                <div style="float:right;">
+                <div class="rightControls">
                     <button id="reset" type="button">Reset Zoom</button> 
+                </div>
+                <div class="rightControls">
+                    <button id="export" type="button">Export Raw CSV</button> 
                 </div>
             </div> 
     </div>
@@ -57,11 +60,10 @@
 
 
     <script>
+        // All our listener events.
+
         var fileInput = document.getElementById("fileUploadButton");
         fileInput.addEventListener('change', readCSV);
-
-        var resetInput = document.getElementById("reset");
-        resetInput.addEventListener('click', resetZoom);
 
         var equationInput = document.getElementById("Epley");
         equationInput.addEventListener('click', equationEpley);
@@ -84,6 +86,11 @@
         var equationInput = document.getElementById("Wathen");
         equationInput.addEventListener('click', equationWathen);
 
+        var exportInput = document.getElementById("export");
+        exportInput.addEventListener('click', exportRawCSV);
+
+        var resetInput = document.getElementById("reset");
+        resetInput.addEventListener('click', resetZoom);
     </script>
 
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
