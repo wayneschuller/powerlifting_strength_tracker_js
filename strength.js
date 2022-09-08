@@ -99,6 +99,9 @@ function processRawLiftData(rawLiftData, equation) {
         else
             label = `Potential 1@${oneRepMax}${unitType} from ${rawLiftData[i].reps}@${rawLiftData[i].weight}${unitType}.`;
 
+        let url = rawLiftData[i].url;
+        if (!url) url = "";
+
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
         if (dateIndex === -1) {
@@ -108,7 +111,7 @@ function processRawLiftData(rawLiftData, equation) {
                     x:rawLiftData[i].date, 
                     y: oneRepMax, 
                     label:`${label}`, 
-                    URL:`${rawLiftData[i].URL}`,
+                    url: url,
                     method: `${equation}`,
                 });
         } else {
@@ -116,8 +119,10 @@ function processRawLiftData(rawLiftData, equation) {
             if (processedData[liftIndex].graphData[dateIndex].method != equation || oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
                 processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
                 processedData[liftIndex].graphData[dateIndex].label = label;
-                processedData[liftIndex].graphData[dateIndex].URL = rawLiftData[i].URL;
                 processedData[liftIndex].graphData[dateIndex].method = equation;
+
+                // FIXME: if we have a URL in each, choose the non-BLOC one
+                processedData[liftIndex].graphData[dateIndex].url = url;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
     }
@@ -391,8 +396,8 @@ function getChartConfig () {
 function chartClickHandler (event, item) {
     if (item && item.length > 0) {
         // console.log(`You clicked this point: ${JSON.stringify(processedData[item[0].datasetIndex].graphData[item[0].index])}`)
-        let URL = processedData[item[0].datasetIndex].graphData[item[0].index].URL;
-        if (URL) window.open(URL);
+        let url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
+        if (url) window.open(url);
     }
 }
 

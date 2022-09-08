@@ -136,7 +136,7 @@ function parseBespokeRow(row, index) {
         url: row[url_COL],
     }
 
-    console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
+    // console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
 
     rawLiftData = this.valueOf(); // Grab the extra array that was passed to the function
     rawLiftData.push(liftEntry); // add to our collection of raw data
@@ -243,14 +243,14 @@ function parseBlocRow(row) {
 
     unitType = row[units_COL]; // Record the units type global for later. (we assume it won't change in the CSV)
 
-    let liftURL = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
+    let liftUrl = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
 
     let liftEntry = {
         date: row[workout_date_COL],
         name: row[exercise_name_COL],
         reps: lifted_reps,
         weight: lifted_weight,
-        URL: liftURL,
+        url: liftUrl,
         units: unitType, 
         // FIXME: any BLOC notes to add?
     }
