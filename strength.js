@@ -41,7 +41,7 @@ function readCSV () {
             processedData.forEach(visualiseAchievements, "Brzycki");
             myChart.update();
 
-            // Now we have the chart show the controls box.
+            // Now we have the chart, show the chart controls box.
             let controlsBox = document.getElementById("chartControlsBox");
             controlsBox.style.visibility = "visible";
     }

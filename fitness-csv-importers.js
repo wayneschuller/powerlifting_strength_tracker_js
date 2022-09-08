@@ -1,8 +1,9 @@
 // importers.js
 // Wayne Schuller, wayne@schuller.id.au, 2022. GPL3 License.
 
-// Globals (FIXME: remove some time)
-let workout_date_COL, workout_id_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL, actual_reps_COL, actual_weight_COL, missed_COL, description_COL, units_COL, notes_COL, url_COL;
+// Globals 
+let workout_date_COL, workout_id_COL, completed_COL, exercise_name_COL, assigned_reps_COL, assigned_weight_COL;
+let assigned_sets_COL, actual_reps_COL, actual_weight_COL, actual_sets_COL, missed_COL, description_COL, units_COL, notes_COL, url_COL;
 
 let lastDate = "1999-12-31";
 let lastLiftType = "Tik Tok Dancing"; 
@@ -43,8 +44,10 @@ function parseCSV(data) {
         exercise_name_COL = columnNames.indexOf("exercise_name");
         assigned_reps_COL = columnNames.indexOf("assigned_reps");
         assigned_weight_COL = columnNames.indexOf("assigned_weight");
+        assigned_sets_COL = columnNames.indexOf("assigned_sets");
         actual_reps_COL = columnNames.indexOf("actual_reps");
         actual_weight_COL = columnNames.indexOf("actual_weight");
+        actual_sets_COL = columnNames.indexOf("actual_sets");
         missed_COL = columnNames.indexOf("assigned_exercise_missed");
         units_COL = columnNames.indexOf("weight_units");
 
@@ -57,7 +60,6 @@ function parseCSV(data) {
 
     // From here let's just assume it is our bespoke CSV format
     // FIXME: URL link to public Google Sheet sample
-    console.log(`Hello bespoke`);
     workout_date_COL = columnNames.indexOf("Date");
     exercise_name_COL = columnNames.indexOf("Lift Type");
     actual_reps_COL = columnNames.indexOf("Reps");
@@ -118,21 +120,6 @@ function parseBespokeRow(row, index) {
     let url = row[url_COL]; if (!url) url = '';
     let notes = row[notes_COL]; if (!notes) notes = '';
 
-
-    // Check - do we have this EXACT lift already from another data source?
-    // let matchIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
-    let matchIndex = rawLiftData.findIndex(lift => (lift.date === date && lift.reps === reps && lift.weight === weight));
-    if (matchIndex != -1) {
-        console.log(`Bespoke parse: ${date}: ${liftType} ${reps}@${weight} matched rawLiftdata entry ${matchIndex} (${JSON.stringify(rawLiftData[matchIndex])})`);
-
-        // Keep the existing data, but bespoke url or notes override any previous url/notes.
-        // e.g.: the bespoke URL is likely to be more interesting than the BLOC app URL.
-        if (url != '') rawLiftData[matchIndex].url = url;
-        if (notes != '') rawLiftData[matchIndex].notes = notes;
-        return; 
-    }
-
-    // It's a totally unique lift, push new object onto rawLiftData
     rawLiftData.push({
         date: date,
         name: liftType,
@@ -252,18 +239,26 @@ function parseBlocRow(row) {
 
     if (liftType === "Squat") liftType = "Back Squat"; // Our other two data types prefer the full squat type
 
-    let liftEntry = {
-        date: row[workout_date_COL],
-        name: liftType,
-        reps: lifted_reps,
-        weight: lifted_weight,
-        url: liftUrl,
-        units: unitType, 
-        notes: '',
-        // FIXME: any BLOC notes to add?
-    }
+    // Expand BLOC sets into separate liftEntry tuples
+    // This makes no difference to the graph, but it benefits a user wanting to convert their BLOC data to our bespoke format
+    // It may help with some achievements and tonnage count in a future feature
+    let sets = 1;
+    if (row[assigned_sets_COL] && row[assigned_sets_COL] > 1) sets = row[assigned_sets_COL];
+    if (row[actual_sets_COL] && row[actual_sets_COL] > 1) sets = row[actual_sets_COL];
 
-    rawLiftData.push(liftEntry); // add to our collection of raw data
+    for (let i = 1; i <= sets; i++) {
+        let notes = `Set ${i} of ${sets}`; 
+        if (sets === 1) notes = ''; // No notes for a single set
+        rawLiftData.push({
+            date: row[workout_date_COL],
+            name: liftType,
+            reps: lifted_reps,
+            weight: lifted_weight,
+            url: liftUrl,
+            units: unitType, 
+            notes: notes, 
+        });
+    }
 }
 
 // Export the current rawLiftData to the user in a CSV format.
