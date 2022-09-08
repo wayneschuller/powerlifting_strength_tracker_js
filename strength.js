@@ -21,6 +21,13 @@ function readCSV () {
             // Process that data into our processedData structure
             // Here we always default to Brzycki 1RM estimation equation (user can change in UI later)
             processRawLiftData(rawLiftData, "Brzycki");
+            
+            // Use the most popular lift to set some aesthetic x-axis padding at start and end
+            // Right now only do this once on first csv load.
+            padDateMin = new Date(processedData[0].graphData[0].x); 
+            padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
+            padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
+            padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
             // Draw or update the chart now we have data.
             if (myChart) {
@@ -125,11 +132,6 @@ function processRawLiftData(rawLiftData, equation) {
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
-    // Use the most popular lift to set some aesthetic x-axis padding at start and end
-    padDateMin = new Date(processedData[0].graphData[0].x); 
-    padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
-    padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
-    padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 }
 
 
