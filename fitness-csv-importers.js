@@ -217,6 +217,8 @@ function parseBlocRow(row) {
             return; 
     }
 
+    if (row[actual_reps_COL] === "actual_reps") return false; // Probably header row
+
     // Give up on this row if it is not a completed workout
     if (!row[completed_COL]) return false;
 

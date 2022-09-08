@@ -24,6 +24,7 @@ function readCSV () {
             
             // Use the most popular lift to set some aesthetic x-axis padding at start and end
             // Right now only do this once on first csv load.
+            // There is a chance loading another data set will require a new range, but unlikely.
             padDateMin = new Date(processedData[0].graphData[0].x); 
             padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
             padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
@@ -89,7 +90,9 @@ function processRawLiftData(rawLiftData, equation) {
         // Main task - find the best e1rm estimate on this date
         let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight, equation);
 
+        
         // Prepare our data label
+        // FIXME: use the unit type in the rawLiftData[i].units, if missing fall back to global unitType
         let label = '';
         if (rawLiftData[i].reps === 1)
             label = `Lifted 1@${rawLiftData[i].weight}${unitType}.`;
@@ -121,7 +124,7 @@ function processRawLiftData(rawLiftData, equation) {
 
     console.log(`Processed raw data into ${processedData.length} different types of lifts. (${equation} equation)`);
 
-    // Override if a dataset has less than our desired number of chart lines. 
+    // We now know how many lift types we have. So reduce the number of expected chart lines if needed.
     if (processedData.length < numChartLines) numChartLines = processedData.length;
 
     // Every element of processedData now has a graphData array
