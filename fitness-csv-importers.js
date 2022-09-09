@@ -91,7 +91,13 @@ function parseBespokeRow(row, index) {
     if (liftType === null) liftType = lastLiftType;
         else lastLiftType = liftType; // Remember good life type in case we need it in a later row
 
+
     if (!row[actual_reps_COL] || !row[actual_weight_COL]) return false; // Do they even lift?
+
+    if (liftType === "Sumo Deadlift") {
+        console.log(`Warning: sumo deadlifter detected. For more information: https://youtu.be/dQw4w9WgXcQ`);
+        // return;
+    }
 
     let reps = row[actual_reps_COL];
 
@@ -151,7 +157,13 @@ function parseBtwbRow(row) {
     let liftType = result[0].trim();
 
     if (liftType === "") {
-        console.log("liftType was empty string, probably a metcon");
+        return;
+    }
+
+    // Our app is not very interested in Crossfit WODs yet
+    // The CSV has no clear indication we can use, so just exclude a few obvious non-lifts
+    if (liftType === "Every" || liftType === "FT" || liftType === "AMRAP" || liftType === "Chipper") {
+        console.log(`Excluding non-lift: ${liftType}`);
         return;
     }
 
