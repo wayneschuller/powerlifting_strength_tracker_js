@@ -40,6 +40,7 @@ function readCSV () {
             controlsBox.style.visibility = "visible";
 
             // Hide the file upload button now. We could support multiple uploads in the future.
+            // FIXME: this is not working 
             let uploadBox = document.getElementById("uploadBox");
             uploadBox.style.display = "none";
     }
@@ -448,13 +449,23 @@ function equationWathen (context) {
     myChart.update();
 }
 
+// Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
-    // processRawLiftData("Wathen");
-    // processedData.forEach(visualiseAchievements, "Wathen");
-    console.log(`toggle achievements`);
-
     let toggleAchInput = document.getElementById("toggleAchievements");
-    // console.log(toggleAchInput.getParsed());
+    if (toggleAchInput.value == "Hide") {
+        toggleAchInput.value = "Show";
+        toggleAchInput.innerHTML = "Show Achievements";
+
+        // The user wants to hide achievements overlay
+        myChart.config.options.plugins.annotation.annotations = null;
+
+    } else {
+        toggleAchInput.value = "Hide";
+        toggleAchInput.innerHTML = "Hide Achievements";
+
+        // The user wants to show achievements overlay
+        myChart.config.options.plugins.annotation.annotations = liftAnnotations;
+    }
 
     myChart.update();
 }
