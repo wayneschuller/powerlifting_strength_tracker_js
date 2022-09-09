@@ -7,9 +7,11 @@ let numChartLines = 4; // How many lifts to show by default (FIXME: make configu
 let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 
-function readCSV () {
+function readCSV (context) {
     let reader = new FileReader; 
-    
+   
+    console.log(`readCSV context: ${context}`);
+
     reader.onload = function () {
             let data = Papa.parse(reader.result, { dynamicTyping: true });
 
@@ -253,16 +255,14 @@ function value(ctx, datasetIndex, index, prop) {
     return parsed ? parsed[prop] : NaN;
 }
 
-// Setup a charts.js chart.
-function getChartConfig () {
+// Push our first num processedData into chart.js datasets 
+function createDataSets(num) {
 
-    // colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(50, 150, 150)', 'rgb(100, 100, 0)'];
-    colors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
+    let colors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
-    // Make line config datasets of the most popular lift types
     let dataSets = [];
-    for (let i = 0; i < numChartLines; i++) {
 
+    for (let i = 0; i < num; i++) {
         // Check if we have this data to chart, then push it on
         if (processedData[i] && processedData[i].name && processedData[i].graphData)
         dataSets.push({
@@ -278,12 +278,16 @@ function getChartConfig () {
             data: processedData[i].graphData,
         });
     }
-        
+    return dataSets;
+ }
+
+// Setup a charts.js chart.
+function getChartConfig () {
+
     const data = {
-        datasets: dataSets, 
+        datasets: createDataSets(numChartLines),
     };
 
-    
     const zoomOptions = {
         limits: {
             // FIXME: we can work out sensible values from our data set and unit type
@@ -406,48 +410,13 @@ function resetZoom () {
 
 
 // Callback handlers for equation dropup menu
-function equationEpley () {
-    processRawLiftData("Epley");
-    processedData.forEach(visualiseAchievements, "Epley");
-    myChart.update();
-}
-
-function equationBrzycki () {
-    processRawLiftData("Brzycki");
-    processedData.forEach(visualiseAchievements, "Brzycki");
-    myChart.update();
-
-}
-
-function equationMcGlothin () {
-    processRawLiftData("McGlothin");
-    processedData.forEach(visualiseAchievements, "McGlothin");
-    myChart.update();
-}
-
-function equationLombardi () {
-    processRawLiftData("Lombardi");
-    processedData.forEach(visualiseAchievements, "Lombardi");
-    myChart.update();
-}
-
-function equationMayhew () {
-    processRawLiftData("Mayhew");
-    processedData.forEach(visualiseAchievements, "Mayhew");
-    myChart.update();
-}
-
-function equationOConner () {
-    processRawLiftData("OConner");
-    processedData.forEach(visualiseAchievements, "OConner");
-    myChart.update();
-}
-
-function equationWathen (context) {
-    processRawLiftData("Wathen");
-    processedData.forEach(visualiseAchievements, "Wathen");
-    myChart.update();
-}
+function equationEpley () { processRawLiftData("Epley"); processedData.forEach(visualiseAchievements, "Epley"); myChart.update(); }
+function equationBrzycki () { processRawLiftData("Brzycki"); processedData.forEach(visualiseAchievements, "Brzycki"); myChart.update(); }
+function equationMcGlothin () { processRawLiftData("McGlothin"); processedData.forEach(visualiseAchievements, "McGlothin"); myChart.update(); }
+function equationLombardi () { processRawLiftData("Lombardi"); processedData.forEach(visualiseAchievements, "Lombardi"); myChart.update(); }
+function equationMayhew () { processRawLiftData("Mayhew"); processedData.forEach(visualiseAchievements, "Mayhew"); myChart.update(); }
+function equationOConner () { processRawLiftData("OConner"); processedData.forEach(visualiseAchievements, "OConner"); myChart.update(); }
+function equationWathen (context) { processRawLiftData("Wathen"); processedData.forEach(visualiseAchievements, "Wathen"); myChart.update(); }
 
 // Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
@@ -467,5 +436,18 @@ function toggleAchievements (context) {
         myChart.config.options.plugins.annotation.annotations = liftAnnotations;
     }
 
+    myChart.update();
+}
+
+// increase the number of lift lines on the chart
+function increaseLifts (context) {
+    numChartLines++;
+    myChart.config.data.datasets = createDataSets(numChartLines);
+    myChart.update();
+}
+
+function decreaseLifts (context) {
+    numChartLines--;
+    myChart.config.data.datasets = createDataSets(numChartLines);
     myChart.update();
 }

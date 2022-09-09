@@ -22,13 +22,21 @@
 
 .chartControlsBox {
     padding: 5px 0px 0px 0px;
+    /* display: inline-block; */
     visibility: hidden;
 }
+
+.leftControls {
+  float: left;
+  padding: 0px 5px 0px 0px;
+}
+
 
 .rightControls {
   float: right;
   padding: 0px 0px 0px 5px;
 }
+
 .uploadBox {
   width: 90%;
   padding: 10px;
@@ -54,7 +62,6 @@
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
-
 
 .dropup:checked .dropup-content {
   display: none;
