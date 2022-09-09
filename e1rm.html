@@ -51,6 +51,9 @@
                 <div class="rightControls">
                     <button id="export" type="button">Export Raw CSV</button> 
                 </div>
+                <div class="rightControls">
+                    <button id="toggleAchievements" type="button">Hide Achievements</button> 
+                </div>
             </div> 
     </div>
     </div>
@@ -89,6 +92,9 @@
 
         var equationInput = document.getElementById("Wathen");
         equationInput.addEventListener('click', equationWathen);
+
+        var toggleAchInput = document.getElementById("toggleAchievements");
+        toggleAchInput.addEventListener('click', toggleAchievements);
 
         var exportInput = document.getElementById("export");
         exportInput.addEventListener('click', exportRawCSV);
