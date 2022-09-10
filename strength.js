@@ -356,6 +356,11 @@ function getChartConfig () {
                         label: function(context) {
                             return data.datasets[context.datasetIndex].data[context.dataIndex].label;
                         },
+                        afterLabel: function(context) {
+                            let url = data.datasets[context.datasetIndex].data[context.dataIndex].url;
+                            if (url) return `Click to open ${url}`;
+                            // return `afterlabel`;
+                        },
                     }
                 },
                 legend: {
