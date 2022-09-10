@@ -57,7 +57,7 @@ function processRawLiftData(equation) {
     for (let i = 0; i < rawLiftData.length; i++) {
 
         let liftIndex = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
-        // console.log(`Index is ${JSON.stringify(index)}`);
+
         if (liftIndex === -1) { 
             // Create a processedLift data structure for this new lift type
             let processedLiftType = { 
@@ -126,7 +126,7 @@ function processRawLiftData(equation) {
         } 
     }
 
-    console.log(`Processed raw data into ${processedData.length} different types of lifts. (${equation} equation)`);
+    console.log(`Processed rawLiftData into ${processedData.length} different types of lifts. (${equation} equation)`);
 
     // We now know how many lift types we have. So reduce the number of expected chart lines if needed.
     if (processedData.length < numChartLines) numChartLines = processedData.length;
@@ -138,7 +138,6 @@ function processRawLiftData(equation) {
 
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
-
 }
 
 
@@ -394,7 +393,6 @@ function getChartConfig () {
 // Used to detect a click on a graph point and open URL in the data.
 function chartClickHandler (event, item) {
     if (item && item.length > 0) {
-        // console.log(`You clicked this point: ${JSON.stringify(processedData[item[0].datasetIndex].graphData[item[0].index])}`)
         let url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
         if (url) window.open(url);
     }
