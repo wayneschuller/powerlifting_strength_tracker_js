@@ -354,12 +354,11 @@ function getChartConfig () {
                            return(formattedDate);
                         },
                         label: function(context) {
-                            return data.datasets[context.datasetIndex].data[context.dataIndex].label;
+                            return context.raw.label;
                         },
                         afterLabel: function(context) {
-                            let url = data.datasets[context.datasetIndex].data[context.dataIndex].url;
+                            let url = context.raw.url;
                             if (url) return `Click to open ${url}`;
-                            // return `afterlabel`;
                         },
                     }
                 },
