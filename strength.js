@@ -171,7 +171,7 @@ function createAchievement(date, weight, text, background, datasetIndex) {
 }
 
 // array function to gather interesting achievements from processedData
-// called as a foreach method with an extra argument string for equation type
+// called as a foreach method with an extra argument string for e1rm equation type (e.g.: "Epley")
 function visualiseAchievements(e, index) {
 
     if (index >= numChartLines) return; // We can only draw annotations where we have made lines
@@ -186,7 +186,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
+        e.graphData[dateIndex].afterLabel = `Best ${e.name} 1RM of all time!`;
     }
 
     if (e.best3RM) {
@@ -196,7 +196,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 3RM of all time!`;
+        e.graphData[dateIndex].afterLabel = `Best ${e.name} 3RM of all time!`;
     }
 
     if (e.best5RM) {
@@ -206,7 +206,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 5RM of all time!`;
+        e.graphData[dateIndex].afterLabel = `Best ${e.name} 5RM of all time!`;
     };
 }
 
@@ -354,12 +354,15 @@ function getChartConfig () {
                            return(formattedDate);
                         },
                         label: function(context) {
-                            return context.raw.label;
+                            return context.raw.label; // Information about the lift
                         },
                         afterLabel: function(context) {
-                            let url = context.raw.url;
-                            if (url) return `Click to open ${url}`;
+                            return context.raw.afterLabel; // Label for achievements
                         },
+                        footer: function(context) {
+                            let url = context[0].raw.url;
+                            if (url) return `Click to open ${url}`; // Reminder they can click to open video
+                        }
                     }
                 },
                 legend: {
