@@ -101,6 +101,8 @@ function processRawLiftData(equation) {
         let url = rawLiftData[i].url;
         if (!url) url = "";
 
+        let notes = rawLiftData[i].notes;
+
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
         if (dateIndex === -1) {
@@ -112,12 +114,14 @@ function processRawLiftData(equation) {
                     label:`${label}`, 
                     url: url,
                     method: `${equation}`,
+                    notes: notes,
                 });
         } else {
             // Update old lift if we are changing equation OR the e1RM is bigger
             if (processedData[liftIndex].graphData[dateIndex].method != equation || oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
                 processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
                 processedData[liftIndex].graphData[dateIndex].label = label;
+                processedData[liftIndex].graphData[dateIndex].notes = notes;
                 processedData[liftIndex].graphData[dateIndex].method = equation;
 
                 // FIXME: if we have a URL in each, choose the non-BLOC one
@@ -186,7 +190,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
-        e.graphData[dateIndex].afterLabel = `Best ${e.name} 1RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 1RM of all time!`;
     }
 
     if (e.best3RM) {
@@ -196,7 +200,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
-        e.graphData[dateIndex].afterLabel = `Best ${e.name} 3RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 3RM of all time!`;
     }
 
     if (e.best5RM) {
@@ -206,7 +210,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
-        e.graphData[dateIndex].afterLabel = `Best ${e.name} 5RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 5RM of all time!`;
     };
 }
 
@@ -358,7 +362,10 @@ function getChartConfig () {
                             return context.raw.label; // Information about the lift
                         },
                         afterLabel: function(context) {
-                            return context.raw.afterLabel; // Label for achievements
+                            let labels = [];
+                            if (context.raw.notes) labels.push(context.raw.notes);
+                            if (context.raw.achievements) labels.push(context.raw.achievements);
+                            return labels; // Label for achievements
                         },
                         footer: function(context) {
                             let url = context[0].raw.url;
