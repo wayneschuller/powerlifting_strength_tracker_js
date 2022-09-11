@@ -217,8 +217,9 @@ function estimateE1RM(reps, weight, equation) {
             console.error("Somebody passed 0 reps... naughty.");
             return 0;
     }
+    console.log(`estimate reps: ${reps}, weight: ${weight}`);
 
-    if (reps == 1) return parseInt(weight); // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
+    if (reps == 1) return weight; // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
 
     switch (equation) {
         case "Epley":
