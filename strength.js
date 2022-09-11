@@ -71,17 +71,18 @@ function processRawLiftData(equation) {
         } 
 
         // Side task - collect some achievements for this lift type
+        // Assuming that the data is sorted reverse chronological, we award the achievements to the oldest lift.
         switch (rawLiftData[i].reps) {
             case 5:
-                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight > processedData[liftIndex].best5RM.weight) 
+                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight >= processedData[liftIndex].best5RM.weight) 
                         processedData[liftIndex].best5RM = rawLiftData[i];
                 break;
             case 3:
-                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight > processedData[liftIndex].best3RM.weight) 
+                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight >= processedData[liftIndex].best3RM.weight) 
                         processedData[liftIndex].best3RM = rawLiftData[i];
                 break;
             case 1:
-                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight > processedData[liftIndex].best1RM.weight) 
+                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight >= processedData[liftIndex].best1RM.weight) 
                         processedData[liftIndex].best1RM = rawLiftData[i];
                 break;
         }
