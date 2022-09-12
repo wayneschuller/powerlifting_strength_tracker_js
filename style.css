@@ -55,7 +55,6 @@
   z-index: 1;
 }
 
-
 .dropup:checked .dropup-content {
   display: none;
 }
