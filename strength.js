@@ -6,6 +6,7 @@ let myChart;
 let numChartLines = 4; // How many lifts to show by default (FIXME: global not needed)
 let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
+const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
 function readCSV (context) {
     let reader = new FileReader; 
@@ -263,8 +264,6 @@ function value(ctx, datasetIndex, index, prop) {
 // Push our first num processedData into chart.js datasets 
 function createDataSets(num) {
 
-    let colors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
-
     let dataSets = [];
 
     for (let i = 0; i < num; i++) {
@@ -272,7 +271,7 @@ function createDataSets(num) {
         if (processedData[i] && processedData[i].name && processedData[i].graphData)
         dataSets.push({
             label: processedData[i].name,
-            backgroundColor: colors[i],
+            backgroundColor: basicColors[i],
             borderColor: 'rgb(50, 50, 50)',
             borderWidth: 2,
             pointStyle: 'circle',
@@ -458,16 +457,21 @@ function increaseLifts (context) {
 
     numChartLines++; // Increase the global but we are not going to use it. (get rid of it)
 
-    // Choose a beautiful color
-    const randomColor = Math.floor(Math.random()*16777215).toString(16);
-
     // How many lines do we have currently
     const lines = myChart.config.data.datasets.length;
 
+    // Choose a beautiful color
+    let color;
+    const randomColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+
+    if (numChartLines > 4) color = randomColor; else {
+        color = basicColors[numChartLines-1];
+    }
+    
     // Manually add the next processedData entry into the chart
     myChart.config.data.datasets.push({
             label: processedData[lines].name,
-            backgroundColor: `#${randomColor}`,
+            backgroundColor: color,
             borderColor: 'rgb(50, 50, 50)',
             borderWidth: 2,
             pointStyle: 'circle',
