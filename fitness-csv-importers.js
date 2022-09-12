@@ -27,8 +27,7 @@ function parseCSV(data) {
         // Dynamically find where all our needed columns are 
         workout_date_COL = columnNames.indexOf("Date");
         description_COL = columnNames.indexOf("Description");
-
-        // FIXME: Should we check for missing columns here?
+        notes_COL = columnNames.indexOf("Notes");
 
         data.data.forEach(parseBtwbRow, rawLiftData);
         return;
@@ -51,13 +50,10 @@ function parseCSV(data) {
         missed_COL = columnNames.indexOf("assigned_exercise_missed");
         units_COL = columnNames.indexOf("weight_units");
 
-        // FIXME: Should we check for missing columns here?
-
         data.data.forEach(parseBlocRow, rawLiftData);
         return;
     } 
    
-
     // From here let's just assume it is our bespoke CSV format
     // FIXME: URL link to public Google Sheet sample
     workout_date_COL = columnNames.indexOf("Date");
@@ -192,16 +188,18 @@ function parseBtwbRow(row) {
         if (!result) continue;
         let curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
         if (curWeight == 0) continue;
-        
+
+
+        let notes = row[notes_COL]; if (!notes) notes = '';
+
         let liftEntry = {
             date: row[workout_date_COL],
             name: liftType,
             reps: curReps,
             weight: curWeight,
             units: unitType, 
-            notes: '',
+            notes: notes,
             url: '',
-            // FIXME: add BTWB notes here
         }
 
         rawLiftData.push(liftEntry); // add to our collection of raw data
