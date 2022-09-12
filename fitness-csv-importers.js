@@ -110,14 +110,14 @@ function parseBespokeRow(row, index) {
 
         // Convert weight to integer
         // FIXME: this might lose 0.5kg amounts?
-        weight = parseInt(weight.slice(0, weight.length-2)); // Remove the units from the end
+        weight = parseFloat(weight.slice(0, weight.length-2)); // Remove the units from the end
 
     } else if (row[actual_weight_COL].indexOf("lb") != -1) {
 
         unitType = "lb";
 
         // Convert weight to integer
-        weight = parseInt(weight.slice(0, weight.length-2)); // Remove the units from the end
+        weight = parseFloat(weight.slice(0, weight.length-2)); // Remove the units from the end
     } 
 
     if (reps === 0 || weight === 0) return false; // Do they even lift?
@@ -176,7 +176,7 @@ function parseBtwbRow(row) {
         let regex = /^[0-9]+/gm;  
         let result = regex.exec(lift);
         if (!result) continue;
-        let curReps = parseInt(result[0]);
+        let curReps = parseFloat(result[0]);
         if (curReps == 0) continue; // FIXME: check why this would happen
 
         // Get units then weight
@@ -190,7 +190,7 @@ function parseBtwbRow(row) {
 
         result = regex.exec(lift);
         if (!result) continue;
-        let curWeight = parseInt(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
+        let curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
         if (curWeight == 0) continue;
         
         let liftEntry = {

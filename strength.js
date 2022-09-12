@@ -59,7 +59,7 @@ function processRawLiftData(equation) {
     for (let i = 0; i < rawLiftData.length; i++) {
 
         let liftIndex = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
-        // console.log(`Index is ${JSON.stringify(index)}`);
+
         if (liftIndex === -1) { 
             // Create a processedLift data structure for this new lift type
             let processedLiftType = { 
@@ -73,17 +73,18 @@ function processRawLiftData(equation) {
         } 
 
         // Side task - collect some achievements for this lift type
+        // Assuming that the data is sorted reverse chronological, we award the achievements to the oldest lift.
         switch (rawLiftData[i].reps) {
             case 5:
-                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight > processedData[liftIndex].best5RM.weight) 
+                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight >= processedData[liftIndex].best5RM.weight) 
                         processedData[liftIndex].best5RM = rawLiftData[i];
                 break;
             case 3:
-                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight > processedData[liftIndex].best3RM.weight) 
+                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight >= processedData[liftIndex].best3RM.weight) 
                         processedData[liftIndex].best3RM = rawLiftData[i];
                 break;
             case 1:
-                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight > processedData[liftIndex].best1RM.weight) 
+                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight >= processedData[liftIndex].best1RM.weight) 
                         processedData[liftIndex].best1RM = rawLiftData[i];
                 break;
         }
@@ -103,6 +104,8 @@ function processRawLiftData(equation) {
         let url = rawLiftData[i].url;
         if (!url) url = "";
 
+        let notes = rawLiftData[i].notes;
+
         // Do we already have any processed data on this date?
         let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
         if (dateIndex === -1) {
@@ -114,12 +117,14 @@ function processRawLiftData(equation) {
                     label:`${label}`, 
                     url: url,
                     method: `${equation}`,
+                    notes: notes,
                 });
         } else {
             // Update old lift if we are changing equation OR the e1RM is bigger
             if (processedData[liftIndex].graphData[dateIndex].method != equation || oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
                 processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
                 processedData[liftIndex].graphData[dateIndex].label = label;
+                processedData[liftIndex].graphData[dateIndex].notes = notes;
                 processedData[liftIndex].graphData[dateIndex].method = equation;
 
                 // FIXME: if we have a URL in each, choose the non-BLOC one
@@ -128,7 +133,7 @@ function processRawLiftData(equation) {
         } 
     }
 
-    console.log(`Processed raw data into ${processedData.length} different types of lifts. (${equation} equation)`);
+    console.log(`Processed rawLiftData into ${processedData.length} different types of lifts. (${equation} equation)`);
 
     // We now know how many lift types we have. So reduce the number of expected chart lines if needed.
     if (processedData.length < numChartLines) numChartLines = processedData.length;
@@ -140,7 +145,6 @@ function processRawLiftData(equation) {
 
     // Also sort our processedData so the most popular lift types get charts first
     processedData.sort((a, b) => b.graphData.length - a.graphData.length);
-
 }
 
 
@@ -174,7 +178,7 @@ function createAchievement(date, weight, text, background, datasetIndex) {
 }
 
 // array function to gather interesting achievements from processedData
-// called as a foreach method with an extra argument string for equation type
+// called as a foreach method with an extra argument string for e1rm equation type (e.g.: "Epley")
 function visualiseAchievements(e, index) {
 
     if (index >= numChartLines) return; // We can only draw annotations where we have made lines
@@ -189,7 +193,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 1RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 1RM of all time!`;
     }
 
     if (e.best3RM) {
@@ -199,7 +203,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 3RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 3RM of all time!`;
     }
 
     if (e.best5RM) {
@@ -209,7 +213,7 @@ function visualiseAchievements(e, index) {
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
-        e.graphData[dateIndex].label = `${e.graphData[dateIndex].label} Best ${e.name} 5RM of all time!`;
+        e.graphData[dateIndex].achievements = `Best ${e.name} 5RM of all time!`;
     };
 }
 
@@ -220,8 +224,9 @@ function estimateE1RM(reps, weight, equation) {
             console.error("Somebody passed 0 reps... naughty.");
             return 0;
     }
+    console.log(`estimate reps: ${reps}, weight: ${weight}`);
 
-    if (reps == 1) return parseInt(weight); // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
+    if (reps == 1) return weight; // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
 
     switch (equation) {
         case "Epley":
@@ -359,8 +364,18 @@ function getChartConfig () {
                            return(formattedDate);
                         },
                         label: function(context) {
-                            return data.datasets[context.datasetIndex].data[context.dataIndex].label;
+                            return context.raw.label; // Information about the lift
                         },
+                        afterLabel: function(context) {
+                            let labels = [];
+                            if (context.raw.notes) labels.push(context.raw.notes);
+                            if (context.raw.achievements) labels.push(context.raw.achievements);
+                            return labels; // Label for achievements
+                        },
+                        footer: function(context) {
+                            let url = context[0].raw.url;
+                            if (url) return `Click to open ${url}`; // Reminder they can click to open video
+                        }
                     }
                 },
                 legend: {
@@ -398,7 +413,6 @@ function getChartConfig () {
 // Used to detect a click on a graph point and open URL in the data.
 function chartClickHandler (event, item) {
     if (item && item.length > 0) {
-        // console.log(`You clicked this point: ${JSON.stringify(processedData[item[0].datasetIndex].graphData[item[0].index])}`)
         let url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
         if (url) window.open(url);
     }
