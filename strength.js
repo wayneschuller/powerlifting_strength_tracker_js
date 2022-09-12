@@ -3,7 +3,8 @@ const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
-let numChartLines = 4; // How many lifts to show by default (FIXME: global not needed)
+let minChartLines = 3; // How many lifts to show by default 
+let maxChartLines = 8; // Maximum number to graph - we will order by most popular lifts. 
 let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
@@ -44,8 +45,8 @@ function readCSV (context) {
 
             // Hide the file upload button now. We could support multiple uploads in the future.
             // FIXME: this is not working 
-            let uploadBox = document.getElementById("uploadBox");
-            uploadBox.style.display = "none";
+            // let uploadBox = document.getElementById("uploadBox");
+            // uploadBox.style.display = "none";
     }
 
     // Start reading the file. When it is done, calls the onload event defined above.
@@ -137,7 +138,7 @@ function processRawLiftData(equation) {
     console.log(`Processed rawLiftData into ${processedData.length} different types of lifts. (${equation} equation)`);
 
     // We now know how many lift types we have. So reduce the number of expected chart lines if needed.
-    if (processedData.length < numChartLines) numChartLines = processedData.length;
+    if (processedData.length < minChartLines) minChartLines = processedData.length;
 
     // Every element of processedData now has a graphData array
     // Let's sort each graphData array by date (x entry) so it draws lines correctly
@@ -182,7 +183,7 @@ function createAchievement(date, weight, text, background, datasetIndex) {
 // called as a foreach method with an extra argument string for e1rm equation type (e.g.: "Epley")
 function visualiseAchievements(e, index) {
 
-    if (index >= numChartLines) return; // We can only draw annotations where we have made lines
+    if (index >= maxChartLines) return; // We can only draw annotations where we have made lines
 
     if (!e) return;
 
@@ -225,7 +226,6 @@ function estimateE1RM(reps, weight, equation) {
             console.error("Somebody passed 0 reps... naughty.");
             return 0;
     }
-    console.log(`estimate reps: ${reps}, weight: ${weight}`);
 
     if (reps == 1) return weight; // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
 
@@ -262,25 +262,39 @@ function value(ctx, datasetIndex, index, prop) {
 }
 
 // Push our first num processedData into chart.js datasets 
-function createDataSets(num) {
+// max = number of data sets to create
+// min = the default number that display (the rest will begin hidden)
+function createDataSets(min, max) {
 
     let dataSets = [];
 
-    for (let i = 0; i < num; i++) {
+    let hidden = false;
+
+    for (let i = 0; i < max; i++) {
+
+        // Choose a beautiful color
+        let color;
+        const randomColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+
+        color = (i >= min) ? randomColor : color = basicColors[i]; 
+
+        if (i >= min) hidden = true; // Initially hide the lines above the minimum
+
         // Check if we have this data to chart, then push it on
         if (processedData[i] && processedData[i].name && processedData[i].graphData)
-        dataSets.push({
-            label: processedData[i].name,
-            backgroundColor: basicColors[i],
-            borderColor: 'rgb(50, 50, 50)',
-            borderWidth: 2,
-            pointStyle: 'circle',
-            radius: 4,
-            hitRadius: 20,
-            hoverRadius: 10,
-            cubicInterpolationMode: 'monotone',
-            data: processedData[i].graphData,
-        });
+            dataSets.push({
+                label: processedData[i].name,
+                backgroundColor: color,
+                borderColor: 'rgb(50, 50, 50)',
+                borderWidth: 2,
+                pointStyle: 'circle',
+                radius: 4,
+                hitRadius: 20,
+                hoverRadius: 10,
+                cubicInterpolationMode: 'monotone',
+                hidden: hidden,
+                data: processedData[i].graphData,
+            });
     }
     return dataSets;
  }
@@ -289,7 +303,7 @@ function createDataSets(num) {
 function getChartConfig () {
 
     const data = {
-        datasets: createDataSets(numChartLines),
+        datasets: createDataSets(minChartLines, maxChartLines),
     };
 
     const zoomOptions = {
@@ -449,46 +463,5 @@ function toggleAchievements (context) {
         myChart.config.options.plugins.annotation.annotations = liftAnnotations;
     }
 
-    myChart.update();
-}
-
-// increase the number of lift lines on the chart
-function increaseLifts (context) {
-
-    numChartLines++; // Increase the global but we are not going to use it. (get rid of it)
-
-    // How many lines do we have currently
-    const lines = myChart.config.data.datasets.length;
-
-    // Choose a beautiful color
-    let color;
-    const randomColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
-
-    if (numChartLines > 4) color = randomColor; else {
-        color = basicColors[numChartLines-1];
-    }
-    
-    // Manually add the next processedData entry into the chart
-    myChart.config.data.datasets.push({
-            label: processedData[lines].name,
-            backgroundColor: color,
-            borderColor: 'rgb(50, 50, 50)',
-            borderWidth: 2,
-            pointStyle: 'circle',
-            radius: 4,
-            hitRadius: 20,
-            hoverRadius: 10,
-            cubicInterpolationMode: 'monotone',
-            data: processedData[lines].graphData,
-        });
-
-    myChart.update();
-}
-
-function decreaseLifts (context) {
-    if (numChartLines <= 1) return; // Must have a minimum of one line?
-
-    numChartLines--;
-    myChart.config.data.datasets.pop();
     myChart.update();
 }
