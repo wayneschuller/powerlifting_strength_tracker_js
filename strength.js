@@ -3,7 +3,7 @@ const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; 
 let myChart; 
-let numChartLines = 4; // How many lifts to show by default (FIXME: make configurable in the html)
+let numChartLines = 4; // How many lifts to show by default (FIXME: global not needed)
 let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 
@@ -455,13 +455,36 @@ function toggleAchievements (context) {
 
 // increase the number of lift lines on the chart
 function increaseLifts (context) {
-    numChartLines++;
-    myChart.config.data.datasets = createDataSets(numChartLines);
+
+    numChartLines++; // Increase the global but we are not going to use it. (get rid of it)
+
+    // Choose a beautiful color
+    const randomColor = Math.floor(Math.random()*16777215).toString(16);
+
+    // How many lines do we have currently
+    const lines = myChart.config.data.datasets.length;
+
+    // Manually add the next processedData entry into the chart
+    myChart.config.data.datasets.push({
+            label: processedData[lines].name,
+            backgroundColor: `#${randomColor}`,
+            borderColor: 'rgb(50, 50, 50)',
+            borderWidth: 2,
+            pointStyle: 'circle',
+            radius: 4,
+            hitRadius: 20,
+            hoverRadius: 10,
+            cubicInterpolationMode: 'monotone',
+            data: processedData[lines].graphData,
+        });
+
     myChart.update();
 }
 
 function decreaseLifts (context) {
+    if (numChartLines <= 1) return; // Must have a minimum of one line?
+
     numChartLines--;
-    myChart.config.data.datasets = createDataSets(numChartLines);
+    myChart.config.data.datasets.pop();
     myChart.update();
 }
