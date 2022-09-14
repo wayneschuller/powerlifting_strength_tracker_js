@@ -26,7 +26,6 @@ function readCSV(context) {
             
             createChart(data.data);
         }
-    }
 
     // Start reading the file. When it is done, calls the onload event defined above.
     reader.readAsText(fileInput.files[0]);
