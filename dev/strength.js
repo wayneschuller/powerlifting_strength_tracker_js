@@ -22,8 +22,22 @@ function readCSV (context) {
                 console.error("Papaparse detected too many errors in file input. Do you even lift?")
                 return null;
             }
+            
+            createChart(data.data);
+        }
+    }
 
-            parseData(data.data);
+    // Start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsText(fileInput.files[0]);
+}
+
+// ----------------------------------------------------------------------
+// createChart - visualise strength history chart
+// Takes data array from either CSV file (papaparse) or Google Sheets API
+// ----------------------------------------------------------------------
+function createChart(data) {
+
+            parseData(data);
 
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure
@@ -53,10 +67,7 @@ function readCSV (context) {
             // FIXME: this is not working 
             // let uploadBox = document.getElementById("uploadBox");
             // uploadBox.style.display = "none";
-    }
 
-    // Start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsText(fileInput.files[0]);
 }
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
