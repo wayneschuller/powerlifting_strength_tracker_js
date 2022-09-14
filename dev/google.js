@@ -177,7 +177,7 @@
     // The user chose a spreadsheet, load the values via API
     let request = gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: ssId,
-        range: 'A:F', // grab five columns of lift data
+        range: 'A1:F50', // grab five columns of lift data
         dateTimeRenderOption: 'FORMATTED_STRING',
     });
 
