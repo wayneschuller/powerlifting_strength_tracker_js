@@ -172,7 +172,7 @@
 
     console.log(`Result: ${JSON.stringify(data, null, 2)}`);
 
-    ssId = data.docs.id;
+    ssId = data.docs[0].id;
     console.log(`attempting to load id: ${ssId}`);
 
     // The user chose a spreadsheet, load the values via API
