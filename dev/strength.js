@@ -17,7 +17,13 @@ function readCSV (context) {
     reader.onload = function () {
             let data = Papa.parse(reader.result, { dynamicTyping: true });
 
-            parseCSV(data);
+            // More than 10 errors might indicate it's a jpg or something non CSV
+            if (data.meta.aborted || data.errors.length > 10) {
+                console.error("Papaparse detected too many errors in file input. Do you even lift?")
+                return null;
+            }
+
+            parseData(data.data);
 
             // We now have the rawLiftData from various sources.
             // Process that data into our processedData structure

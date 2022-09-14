@@ -10,17 +10,12 @@ let lastLiftType = "Tik Tok Dancing";
 
 // ----------------------------------------------------------------------
 // parseCSV(data)
-// Determine the CSV data format, parse into the rawLiftData global
+// Determine the data format, parse into the rawLiftData global
+// Assumes a data[][] 2d grid (from CSV or Google Sheets)
 // ----------------------------------------------------------------------
-function parseCSV(data) {
+function parseData(data) {
 
-    // More than 10 errors might indicate it's a jpg or something non CSV
-    if (data.meta.aborted || data.errors.length > 10) {
-        console.error("Papaparse detected too many errors in file input. Do you even lift?")
-        return null;
-    }
-
-    let columnNames = data.data[0];
+    let columnNames = data[0];
 
     // Look for distinctive BTWB CSV data columns - no one else will have a Pukie column
     if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
@@ -29,7 +24,7 @@ function parseCSV(data) {
         description_COL = columnNames.indexOf("Description");
         notes_COL = columnNames.indexOf("Notes");
 
-        data.data.forEach(parseBtwbRow, rawLiftData);
+        data.forEach(parseBtwbRow, rawLiftData);
         return;
     } 
 
@@ -50,7 +45,7 @@ function parseCSV(data) {
         missed_COL = columnNames.indexOf("assigned_exercise_missed");
         units_COL = columnNames.indexOf("weight_units");
 
-        data.data.forEach(parseBlocRow, rawLiftData);
+        data.forEach(parseBlocRow, rawLiftData);
         return;
     } 
    
@@ -63,7 +58,7 @@ function parseCSV(data) {
     notes_COL = columnNames.indexOf("Notes");
     url_COL = columnNames.indexOf("URL");
 
-    data.data.forEach(parseBespokeRow, rawLiftData);
+    data.forEach(parseBespokeRow, rawLiftData);
     return;
 }
 
