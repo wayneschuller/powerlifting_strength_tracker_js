@@ -36,7 +36,7 @@
 
   // Authorization scopes required by the API; multiple scopes can be
   // included, separated by spaces.
-  const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly	';
+  const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonlyG	';
 
   // TODO(developer): Set to client ID and API key from the Developer Console
   const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
@@ -44,10 +44,13 @@
 
   // TODO(developer): Replace with your own project number from console.developers.google.com.
   const APP_ID = '465438544924';
+  const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+
 
   let tokenClient;
   let accessToken = null;
   let pickerInited = false;
+  let gapiInited = false;
   let gisInited = false;
 
 
@@ -59,6 +62,7 @@
    */
   function gapiLoaded() {
     gapi.load('picker', intializePicker);
+    gapi.load('client', intializeGapiClient);
   }
 
   /**
@@ -68,6 +72,16 @@
   function intializePicker() {
     pickerInited = true;
     maybeEnableButtons();
+  }
+
+
+  function intializeGapiClient() {
+      await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
   }
 
   /**
@@ -154,7 +168,7 @@
    */
   function pickerCallback(data) {
     if (data.action === google.picker.Action.PICKED) {
-        document.getElementById('content').innerText = JSON.stringify(data, null, 2);
+        // document.getElementById('content').innerText = JSON.stringify(data, null, 2);
         console.log(`Result: ${JSON.stringify(data, null, 2)}`);
     } else return;
 
