@@ -38,7 +38,8 @@
   // included, separated by spaces.
   const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 
-  // TODO(developer): Set to client ID and API key from the Developer Console
+  // This key pairing will only work from wayneschuller.github.io
+  // If you fork the code you must use your own key.
   const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
   const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
 
@@ -177,7 +178,7 @@
     // The user chose a spreadsheet, load the values via API
     let request = gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: ssId,
-        range: 'A1:F50', // grab five columns of lift data
+        range: 'A:F', // grab five columns of lift data
         dateTimeRenderOption: 'FORMATTED_STRING',
     });
 
