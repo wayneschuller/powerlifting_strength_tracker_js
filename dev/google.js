@@ -156,5 +156,20 @@
     if (data.action === google.picker.Action.PICKED) {
         document.getElementById('content').innerText = JSON.stringify(data, null, 2);
         console.log(`Result: ${JSON.stringify(data, null, 2)}`);
-    }
-  }
+    } else return;
+
+    ssId = data.docs.id;
+
+    // The user chose a spreadsheet, load the values via API
+    let request = gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: ssId,
+        range: 'A:F', // grab five columns of lift data
+        dateTimeRenderOption: 'FORMATTED_STRING',
+    });
+
+    request.then(function(response) {
+        console.log(response.result);
+    }, function(reason) {
+        console.error(`error: ${reason.result.error.message}`);
+    });
+}
