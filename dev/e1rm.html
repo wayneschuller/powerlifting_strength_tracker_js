@@ -17,7 +17,6 @@
     <link href='style.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Catamaran">
 
-    <script src="https://accounts.google.com/gsi/client" async defer> </script>
 </head>
 
 <body>
@@ -76,23 +75,9 @@
 
 
 
-   <script>
-        function handleCredentialResponse(response) {
-          console.log("Encoded JWT ID token: " + response.credential);
-        }
-        window.onload = function () {
-          google.accounts.id.initialize({
-            client_id: "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-          });
-          google.accounts.id.renderButton(
-            document.getElementById("buttonDiv"),
-            { theme: "outline", size: "large" }  // customization attributes
-          );
-          //google.accounts.id.prompt(); // also display the One Tap dialog
-        }
-    </script>
-    <div id="buttonDiv"></div> 
+    <script src="https://accounts.google.com/gsi/client" async defer> </script>
+    <script src="google.js" async defer></script>
+    <div id="gisButton"></div> 
 
 
 </body>
