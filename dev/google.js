@@ -168,12 +168,12 @@
    * @param {object} data - Containers the user selection from the picker
    */
   function pickerCallback(data) {
-    if (data.action === google.picker.Action.PICKED) {
-        // document.getElementById('content').innerText = JSON.stringify(data, null, 2);
-        console.log(`Result: ${JSON.stringify(data, null, 2)}`);
-    } else return;
+    if (data.action !== google.picker.Action.PICKED) return; // nothing picked
+
+    console.log(`Result: ${JSON.stringify(data, null, 2)}`);
 
     ssId = data.docs.id;
+    console.log(`attempting to load id: ${ssId}`);
 
     // The user chose a spreadsheet, load the values via API
     let request = gapi.client.sheets.spreadsheets.values.get({
