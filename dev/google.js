@@ -76,7 +76,7 @@
 
 
   function intializeGapiClient() {
-      await gapi.client.init({
+      gapi.client.init({
           apiKey: API_KEY,
           discoveryDocs: [DISCOVERY_DOC],
         });
