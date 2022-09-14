@@ -27,16 +27,14 @@ window.onload = function () {
 function handleCredentialResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
 
-    const showPicker = () => {
-        // TODO(developer): Replace with your API key
-        const picker = new google.picker.PickerBuilder()
-            .addView(google.picker.ViewId.DOCS)
-            .setOAuthToken(response.credential)
-            .setDeveloperKey(GOOGLE_API_KEY)
-            .setCallback(pickerCallback)
-            .build();
-        picker.setVisible(true);
-    }
+    const picker = new google.picker.PickerBuilder()
+        .addView(google.picker.ViewId.DOCS)
+        .setOAuthToken(response.credential)
+        .setDeveloperKey(GOOGLE_API_KEY)
+        .setCallback(pickerCallback)
+        .build();
+
+    picker.setVisible(true);
 }
 
  // A simple callback implementation.
