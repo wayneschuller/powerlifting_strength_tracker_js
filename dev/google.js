@@ -2,7 +2,7 @@
 
 // This API key is linked only to the wayneschuller.github.io domain
 // It has minimal API libraries enabled for picking and reading a Google Sheet
-const GOOGLE_API_KEY = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
+//const GOOGLE_API_KEY = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
 
 
 // Load up the gisButton for google authentication.
@@ -39,11 +39,11 @@ const GOOGLE_API_KEY = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googl
   const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 
   // TODO(developer): Set to client ID and API key from the Developer Console
-  const CLIENT_ID = '<YOUR_CLIENT_ID>';
-  const API_KEY = '<YOUR_API_KEY>';
+  const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
+  const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
 
   // TODO(developer): Replace with your own project number from console.developers.google.com.
-  const APP_ID = '<YOUR_APP_ID>';
+  const APP_ID = '465438544924';
 
   let tokenClient;
   let accessToken = null;
