@@ -1,38 +1,6 @@
 // Helper functions for Google Drive/Sheets data integration
 
-// This API key is linked only to the wayneschuller.github.io domain
-// It has minimal API libraries enabled for picking and reading a Google Sheet
-//const GOOGLE_API_KEY = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
-
-
-// Load up the gisButton for google authentication.
-// We could bind this with a better UI
-// window.onload = function () {
-//     google.accounts.id.initialize({
-//         // This API key is linked only to the wayneschuller.github.io domain
-//         // It has minimal API libraries enabled for picking and reading a Google Sheet
-//         client_id: GOOGLE_API_KEY,
-//         callback: handleCredentialResponse
-//     });
-
-//     google.accounts.id.renderButton( 
-//         document.getElementById("gisButton"),
-//         { theme: "outline", size: "large" }  // customization attributes
-//     );
-//     //google.accounts.id.prompt(); // also display the One Tap dialog
-// }
-
-
-// callback for when user successfully authenticates via Google GIS
-// function handleCredentialResponse(response) {
-//     console.log("Encoded JWT ID token: " + response.credential);
-// }
-
-// Sample code from: https://developers.google.com/drive/picker/guides/sample 
-  /* exported gapiLoaded */
-  /* exported gisLoaded */
-  /* exported handleAuthClick */
-  /* exported handleSignoutClick */
+// Based on sample code from: https://developers.google.com/drive/picker/guides/sample 
 
   // Authorization scopes required by the API; multiple scopes can be
   // included, separated by spaces.
@@ -151,8 +119,6 @@
     const view = new google.picker.View(google.picker.ViewId.SPREADSHEETS);
     //view.setMimeTypes('image/png,image/jpeg,image/jpg');
     const picker = new google.picker.PickerBuilder()
-        //.enableFeature(google.picker.Feature.NAV_HIDDEN)
-        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
         .setDeveloperKey(API_KEY)
         .setAppId(APP_ID)
         .setOAuthToken(accessToken)
