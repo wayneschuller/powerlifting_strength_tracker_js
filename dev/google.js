@@ -51,8 +51,8 @@
   let gisInited = false;
 
 
-  document.getElementById('authorize_button').style.visibility = 'hidden';
-  document.getElementById('signout_button').style.visibility = 'hidden';
+  //document.getElementById('authorize_button').style.visibility = 'hidden';
+  //document.getElementById('signout_button').style.visibility = 'hidden';
 
   /**
    * Callback after api.js is loaded.
@@ -133,10 +133,10 @@
    *  Create and render a Picker object for searching images.
    */
   function createPicker() {
-    const view = new google.picker.View(google.picker.ViewId.DOCS);
+    const view = new google.picker.View(google.picker.ViewId.SPREADSHEETS);
     view.setMimeTypes('image/png,image/jpeg,image/jpg');
     const picker = new google.picker.PickerBuilder()
-        .enableFeature(google.picker.Feature.NAV_HIDDEN)
+        //.enableFeature(google.picker.Feature.NAV_HIDDEN)
         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
         .setDeveloperKey(API_KEY)
         .setAppId(APP_ID)
@@ -154,6 +154,7 @@
    */
   function pickerCallback(data) {
     if (data.action === google.picker.Action.PICKED) {
-      document.getElementById('content').innerText = JSON.stringify(data, null, 2);
+        document.getElementById('content').innerText = JSON.stringify(data, null, 2);
+        console.log(`Result: ${JSON.stringify(data, null, 2)}`);
     }
   }
