@@ -9,7 +9,8 @@ let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
-function readCSV (context) {
+// Use Papaparse to process whatever file is given via the html file picker
+function readCSV(context) {
     let reader = new FileReader; 
    
     console.log(`readCSV context: ${context}`);

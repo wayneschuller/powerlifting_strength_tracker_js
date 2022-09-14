@@ -149,7 +149,10 @@
     });
 
     request.then(function(response) {
-        console.log(response.result);
+        // console.log(response.result);
+
+        // We have the google sheet data.
+        createChart(response.result.values);
     }, function(reason) {
         console.error(`error: ${reason.result.error.message}`);
     });
