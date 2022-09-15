@@ -10,17 +10,12 @@ let lastLiftType = "Tik Tok Dancing";
 
 // ----------------------------------------------------------------------
 // parseCSV(data)
-// Determine the CSV data format, parse into the rawLiftData global
+// Discern the data format, parse into the rawLiftData global
+// Assumes a data[][] 2d grid (from CSV or Google Sheets)
 // ----------------------------------------------------------------------
-function parseCSV(data) {
+function parseData(data) {
 
-    // More than 10 errors might indicate it's a jpg or something non CSV
-    if (data.meta.aborted || data.errors.length > 10) {
-        console.error("Papaparse detected too many errors in file input. Do you even lift?")
-        return null;
-    }
-
-    let columnNames = data.data[0];
+    let columnNames = data[0];
 
     // Look for distinctive BTWB CSV data columns - no one else will have a Pukie column
     if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
@@ -29,7 +24,7 @@ function parseCSV(data) {
         description_COL = columnNames.indexOf("Description");
         notes_COL = columnNames.indexOf("Notes");
 
-        data.data.forEach(parseBtwbRow, rawLiftData);
+        data.forEach(parseBtwbRow, rawLiftData);
         return;
     } 
 
@@ -50,11 +45,11 @@ function parseCSV(data) {
         missed_COL = columnNames.indexOf("assigned_exercise_missed");
         units_COL = columnNames.indexOf("weight_units");
 
-        data.data.forEach(parseBlocRow, rawLiftData);
+        data.forEach(parseBlocRow, rawLiftData);
         return;
     } 
    
-    // From here let's just assume it is our bespoke CSV format
+    // From here let's just assume it is our bespoke CSV/GSheet format
     // FIXME: URL link to public Google Sheet sample
     workout_date_COL = columnNames.indexOf("Date");
     exercise_name_COL = columnNames.indexOf("Lift Type");
@@ -63,7 +58,7 @@ function parseCSV(data) {
     notes_COL = columnNames.indexOf("Notes");
     url_COL = columnNames.indexOf("URL");
 
-    data.data.forEach(parseBespokeRow, rawLiftData);
+    data.forEach(parseBespokeRow, rawLiftData);
     return;
 }
 
@@ -78,13 +73,14 @@ function parseBespokeRow(row, index) {
     if (row[actual_reps_COL] === "Reps") return false; // Probably header row
 
     let date = row[workout_date_COL];
-    // If date is null we need to use the previous date in the dataset
-    if (date === null) date = lastDate;
+
+    // If date is null we need to use the previous date in the dataset (via lastDate global)
+    if (date === null || date === '') date = lastDate;
         else lastDate = date; // Remember good date in case we need it in a later row
 
     let liftType = row[exercise_name_COL];
-    // If lift type is null we need to use the previous lift type
-    if (liftType === null) liftType = lastLiftType;
+    // If lift type is null we need to use the previous lift type (via liftType global)
+    if (liftType === null || liftType === '') liftType = lastLiftType;
         else lastLiftType = liftType; // Remember good life type in case we need it in a later row
 
 
@@ -99,6 +95,7 @@ function parseBespokeRow(row, index) {
 
     // Default will be to assume a raw number that is in pounds
     let weight = row[actual_weight_COL];
+
     // Look for units inside the weight string 
     if (row[actual_weight_COL].indexOf("kg") != -1) {
 
@@ -189,7 +186,6 @@ function parseBtwbRow(row) {
         let curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
         if (curWeight == 0) continue;
 
-
         let notes = row[notes_COL]; if (!notes) notes = '';
 
         let liftEntry = {
@@ -220,14 +216,14 @@ function parseBlocRow(row) {
     if (row[actual_reps_COL] === "actual_reps") return false; // Probably header row
 
     // Give up on this row if it is not a completed workout
-    if (!row[completed_COL]) return false;
+    if (row[completed_COL] === false || row[completed_COL] === 'FALSE') return false;
 
     // Give up on this row if missed_COL is true 
-    if (row[missed_COL] === true) return false;
+    if (row[missed_COL] === true || row[missed_COL] === 'TRUE') return false;
 
     // Give up on this row if there are no assigned reps 
     // Happens when a BLOC coach leaves comments in the web app
-    if (!row[assigned_reps_COL]) return false;
+    if (row[assigned_reps_COL] === null || row[assigned_reps_COL] === '') return false;
 
     let lifted_reps = row[assigned_reps_COL];
     let lifted_weight = row[assigned_weight_COL];

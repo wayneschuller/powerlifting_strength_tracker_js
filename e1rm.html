@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Strength History Visualiser</title>
+    <title>Strength History Visualiser DEVELOPMENT</title>
 
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js" integrity="sha256-Ue6wom48SQbpmwW9QIk7pyVDR5Bg36SetP67V2pDkxc=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" integrity="sha256-+8RZJua0aEWg+QVVKg4LEzEEm/8RFez5Tb4JBNiV5xA=" crossorigin="anonymous"></script>
@@ -14,13 +14,19 @@
 
     <script src="strength.js"></script>
     <script src="fitness-csv-importers.js"></script>
+    <script src="google.js"></script>
     <link href='style.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Catamaran">
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
 </head>
 
 <body>
 
-    <h1>Strength History Visualiser</h1>
+    <h1>Strength History Visualiser DEVELOPMENT</h1>
+
+    <h2> This placeholder is for testing Google Identity Services from this domain. <a href="../e1rm.html">Go back to the main app.</a></h2>
 
     <p>Visualise your lift history using a <a href="https://en.wikipedia.org/wiki/One-repetition_maximum">1 rep max estimate</a> for different 
     repetition variations to track progress over time. 
@@ -56,10 +62,10 @@
     </div>
 
     <div class="uploadBox">
-        <p>Select local CSV File: <input id="fileUploadButton" type="file""> </p>
+        <p> <button id="googleDrive" onclick="loadGooglePicker()">Load data from Google Sheets</button> OR select local CSV File: <input id="fileUploadButton" type="file""> </p>
         <p>Here is our custom <a href="https://docs.google.com/spreadsheets/d/14J9z9iJBCeJksesf3MdmpTUmo2TIckDxIQcTx1CPEO0/edit#gid=0" target="_blank">Google Sheet data format</a>. 
-            Make a copy of this Google Sheet and enter your lift data. To view your chart, download your Google Sheet as a CSV file and upload here (we will try to automate this process in the future).</p>
-        <p>We can also visualise CSV exports from <a href="https://barbell-logic.com/">BLOC client app</a> and <a href="https://beyondthewhiteboard.com/">BTWB</a>.</p>
+            Make a copy of this Google Sheet for your own use.</p>
+        <p>We can also visualise data exports from <a href="https://barbell-logic.com/">BLOC client app</a> and <a href="https://beyondthewhiteboard.com/">BTWB</a>.</p>
     </div>
 
 
@@ -67,8 +73,13 @@
         var fileInput = document.getElementById("fileUploadButton");
         fileInput.addEventListener('change', readCSV);
     </script>
-<p> Here is a sample output: <a href="sample_chart.jpg"> <img src="sample_chart.jpg" width="200px"></a></p>
+<p> Here is a sample output: <a href="../sample_chart.jpg"> <img src="../sample_chart.jpg" width="200px"></a></p>
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
+
+
+
+
+
 
 </body>
 </html>

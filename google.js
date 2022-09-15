@@ -11,13 +11,11 @@
   const APP_ID = '465438544924';
   const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
-
   let tokenClient;
   let accessToken = null;
   let pickerInited = false;
   let gapiInited = false;
   let gisInited = false;
-
 
   /**
    * Callback after api.js is loaded.
@@ -85,16 +83,12 @@ function createPicker() {
         .setAppId(APP_ID)
         .setOAuthToken(accessToken)
         .addView(google.picker.ViewId.SPREADSHEETS)
-        //.addView(new google.picker.DocsUploadView())
         .setCallback(pickerCallback)
         .build();
     picker.setVisible(true);
   }
 
-  /**
-   * Displays the file details of the user's selection.
-   * @param {object} data - Containers the user selection from the picker
-   */
+  // Get the google sheet the user picked and load the columns in the first sheet
   function pickerCallback(data) {
     if (data.action !== google.picker.Action.PICKED) return; // nothing picked
 
