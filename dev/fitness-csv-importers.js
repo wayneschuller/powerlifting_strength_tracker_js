@@ -216,14 +216,14 @@ function parseBlocRow(row) {
     if (row[actual_reps_COL] === "actual_reps") return false; // Probably header row
 
     // Give up on this row if it is not a completed workout
-    if (!row[completed_COL]) return false;
+    if (row[completed_COL] === false || row[completed_COL] === 'FALSE') return false;
 
     // Give up on this row if missed_COL is true 
-    if (row[missed_COL] === true) return false;
+    if (row[missed_COL] === true || row[missed_COL] === 'TRUE') return false;
 
     // Give up on this row if there are no assigned reps 
     // Happens when a BLOC coach leaves comments in the web app
-    if (!row[assigned_reps_COL]) return false;
+    if (row[assigned_reps_COL] === null || row[assigned_reps_COL] === '') return false;
 
     let lifted_reps = row[assigned_reps_COL];
     let lifted_weight = row[assigned_weight_COL];
