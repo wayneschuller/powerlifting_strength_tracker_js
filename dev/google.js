@@ -19,34 +19,12 @@
   let gisInited = false;
 
 
-  //document.getElementById('authorize_button').style.visibility = 'hidden';
-  //document.getElementById('signout_button').style.visibility = 'hidden';
-
   /**
    * Callback after api.js is loaded.
    */
   function gapiLoaded() {
     gapi.load('picker', intializePicker);
     gapi.load('client', intializeGapiClient);
-  }
-
-  /**
-   * Callback after the API client is loaded. Loads the
-   * discovery doc to initialize the API.
-   */
-  function intializePicker() {
-    pickerInited = true;
-    maybeEnableButtons();
-  }
-
-
-  function intializeGapiClient() {
-      gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-        maybeEnableButtons();
   }
 
   /**
@@ -59,29 +37,35 @@
       callback: '', // defined later
     });
     gisInited = true;
-    maybeEnableButtons();
   }
 
   /**
-   * Enables user interaction after all libraries are loaded.
+   * Callback after the API client is loaded. Loads the
+   * discovery doc to initialize the API.
    */
-  function maybeEnableButtons() {
-    if (pickerInited && gisInited) {
-      document.getElementById('authorize_button').style.visibility = 'visible';
-    }
+  function intializePicker() {
+    pickerInited = true;
   }
 
+
+  function intializeGapiClient() {
+      gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+  }
+
+
   /**
-   *  Sign in the user upon button click.
+   *  Sign in the user upon button click and call createPicker to choose a google sheet
    */
-  function handleAuthClick() {
+  function loadGooglePicker() {
     tokenClient.callback = async (response) => {
       if (response.error !== undefined) {
         throw (response);
       }
       accessToken = response.access_token;
-      document.getElementById('signout_button').style.visibility = 'visible';
-      document.getElementById('authorize_button').innerText = 'Refresh';
       await createPicker();
     };
 
@@ -95,31 +79,13 @@
     }
   }
 
-  /**
-   *  Sign out the user upon button click.
-   */
-  function handleSignoutClick() {
-    if (accessToken) {
-      accessToken = null;
-      google.accounts.oauth2.revoke(accessToken);
-      document.getElementById('content').innerText = '';
-      document.getElementById('authorize_button').innerText = 'Authorize';
-      document.getElementById('signout_button').style.visibility = 'hidden';
-    }
-  }
-
-  /**
-   *  Create and render a Picker object for searching images.
-   */
-  function createPicker() {
-    const view = new google.picker.View(google.picker.ViewId.SPREADSHEETS);
-    //view.setMimeTypes('image/png,image/jpeg,image/jpg');
-    const picker = new google.picker.PickerBuilder()
+function createPicker() {
+  const picker = new google.picker.PickerBuilder()
         .setDeveloperKey(API_KEY)
         .setAppId(APP_ID)
         .setOAuthToken(accessToken)
-        .addView(view)
-        .addView(new google.picker.DocsUploadView())
+        .addView(google.picker.ViewId.SPREADSHEETS)
+        //.addView(new google.picker.DocsUploadView())
         .setCallback(pickerCallback)
         .build();
     picker.setVisible(true);
