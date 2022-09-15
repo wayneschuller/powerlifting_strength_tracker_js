@@ -75,12 +75,12 @@ function parseBespokeRow(row, index) {
     let date = row[workout_date_COL];
 
     // If date is null we need to use the previous date in the dataset (via lastDate global)
-    if (date === null) date = lastDate;
+    if (date === null || date === '') date = lastDate;
         else lastDate = date; // Remember good date in case we need it in a later row
 
     let liftType = row[exercise_name_COL];
     // If lift type is null we need to use the previous lift type (via liftType global)
-    if (liftType === null) liftType = lastLiftType;
+    if (liftType === null || liftType === '') liftType = lastLiftType;
         else lastLiftType = liftType; // Remember good life type in case we need it in a later row
 
 
