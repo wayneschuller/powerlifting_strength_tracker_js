@@ -1,64 +1,62 @@
 // Helper functions for Google Drive/Sheets data integration
 
-// Based on sample code from: https://developers.google.com/drive/picker/guides/sample 
+const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 
-  const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
+// This key pairing will only work from wayneschuller.github.io
+// If you fork the code you must use your own key.
+const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
+const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
+const APP_ID = '465438544924';
+const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
-  // This key pairing will only work from wayneschuller.github.io
-  // If you fork the code you must use your own key.
-  const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
-  const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
-  const APP_ID = '465438544924';
-  const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+let tokenClient;
+let accessToken = null;
+let pickerInited = false;
+let gapiInited = false;
+let gisInited = false;
 
-  let tokenClient;
-  let accessToken = null;
-  let pickerInited = false;
-  let gapiInited = false;
-  let gisInited = false;
-
-  /**
-   * Callback after api.js is loaded.
-   */
-  function gapiLoaded() {
+/**
+ * Callback after api.js is loaded.
+ */
+function gapiLoaded() {
     gapi.load('picker', intializePicker);
     gapi.load('client', intializeGapiClient);
-  }
+}
 
-  /**
-   * Callback after Google Identity Services are loaded.
-   */
-  function gisLoaded() {
+/**
+ * Callback after Google Identity Services are loaded.
+ */
+function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
       callback: '', // defined later
     });
     gisInited = true;
-  }
+}
 
-  /**
-   * Callback after the API client is loaded. Loads the
-   * discovery doc to initialize the API.
-   */
-  function intializePicker() {
+/**
+ * Callback after the API client is loaded. Loads the
+ * discovery doc to initialize the API.
+ */
+function intializePicker() {
     pickerInited = true;
-  }
+}
 
 
-  function intializeGapiClient() {
+function intializeGapiClient() {
       gapi.client.init({
           apiKey: API_KEY,
           discoveryDocs: [DISCOVERY_DOC],
         });
         gapiInited = true;
-  }
+}
 
 
-  /**
-   *  Sign in the user upon button click and call createPicker to choose a google sheet
-   */
-  function loadGooglePicker() {
+/**
+ *  Sign in the user upon button click and call createPicker to choose a google sheet
+ */
+function loadGooglePicker() {
     tokenClient.callback = async (response) => {
       if (response.error !== undefined) {
         throw (response);
@@ -75,7 +73,7 @@
       // Skip display of account chooser and consent dialog for an existing session.
       tokenClient.requestAccessToken({prompt: ''});
     }
-  }
+}
 
 function createPicker() {
   const picker = new google.picker.PickerBuilder()
@@ -86,10 +84,10 @@ function createPicker() {
         .setCallback(pickerCallback)
         .build();
     picker.setVisible(true);
-  }
+}
 
-  // Get the google sheet the user picked and load the columns in the first sheet
-  function pickerCallback(data) {
+// Get the google sheet the user picked and load the columns in the first sheet
+function pickerCallback(data) {
     if (data.action !== google.picker.Action.PICKED) return; // nothing picked
 
     console.log(`Result: ${JSON.stringify(data, null, 2)}`);
