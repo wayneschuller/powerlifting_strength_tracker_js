@@ -149,10 +149,7 @@
     });
 
     request.then(function(response) {
-
-        console.log(`GSheet data loaded: ${response.result}`);
-
-        // We have the google sheet data.
+        // We have the google sheet data
         createChart(response.result.values);
     }, function(reason) {
         console.error(`error: ${reason.result.error.message}`);
