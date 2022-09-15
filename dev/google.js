@@ -2,16 +2,12 @@
 
 // Based on sample code from: https://developers.google.com/drive/picker/guides/sample 
 
-  // Authorization scopes required by the API; multiple scopes can be
-  // included, separated by spaces.
   const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 
   // This key pairing will only work from wayneschuller.github.io
   // If you fork the code you must use your own key.
   const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
   const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
-
-  // TODO(developer): Replace with your own project number from console.developers.google.com.
   const APP_ID = '465438544924';
   const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
@@ -138,8 +134,7 @@
 
     console.log(`Result: ${JSON.stringify(data, null, 2)}`);
 
-    ssId = data.docs[0].id;
-    console.log(`attempting to load id: ${ssId}`);
+    ssId = data.docs[0].id; // Select the first ID they picked
 
     // The user chose a spreadsheet, load the values via API
     let request = gapi.client.sheets.spreadsheets.values.get({
