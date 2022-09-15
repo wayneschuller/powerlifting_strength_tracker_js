@@ -10,7 +10,7 @@ let lastLiftType = "Tik Tok Dancing";
 
 // ----------------------------------------------------------------------
 // parseCSV(data)
-// Determine the data format, parse into the rawLiftData global
+// Discern the data format, parse into the rawLiftData global
 // Assumes a data[][] 2d grid (from CSV or Google Sheets)
 // ----------------------------------------------------------------------
 function parseData(data) {
@@ -49,7 +49,7 @@ function parseData(data) {
         return;
     } 
    
-    // From here let's just assume it is our bespoke CSV format
+    // From here let's just assume it is our bespoke CSV/GSheet format
     // FIXME: URL link to public Google Sheet sample
     workout_date_COL = columnNames.indexOf("Date");
     exercise_name_COL = columnNames.indexOf("Lift Type");
@@ -73,12 +73,13 @@ function parseBespokeRow(row, index) {
     if (row[actual_reps_COL] === "Reps") return false; // Probably header row
 
     let date = row[workout_date_COL];
-    // If date is null we need to use the previous date in the dataset
+
+    // If date is null we need to use the previous date in the dataset (via lastDate global)
     if (date === null) date = lastDate;
         else lastDate = date; // Remember good date in case we need it in a later row
 
     let liftType = row[exercise_name_COL];
-    // If lift type is null we need to use the previous lift type
+    // If lift type is null we need to use the previous lift type (via liftType global)
     if (liftType === null) liftType = lastLiftType;
         else lastLiftType = liftType; // Remember good life type in case we need it in a later row
 
@@ -94,6 +95,7 @@ function parseBespokeRow(row, index) {
 
     // Default will be to assume a raw number that is in pounds
     let weight = row[actual_weight_COL];
+
     // Look for units inside the weight string 
     if (row[actual_weight_COL].indexOf("kg") != -1) {
 
@@ -183,7 +185,6 @@ function parseBtwbRow(row) {
         if (!result) continue;
         let curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
         if (curWeight == 0) continue;
-
 
         let notes = row[notes_COL]; if (!notes) notes = '';
 

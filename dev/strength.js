@@ -1,7 +1,7 @@
 // Global variables
 const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
-const liftAnnotations = {}; 
+const liftAnnotations = {}; // chart.js annotations plugin data
 let myChart; 
 let minChartLines = 3; // How many lifts to show by default 
 let maxChartLines = 8; // Maximum number to graph - we will order by most popular lifts. 
@@ -9,65 +9,42 @@ let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
-// Use Papaparse to process whatever file is given via the html file picker
-function readCSV(context) {
-    let reader = new FileReader; 
-   
-    console.log(`readCSV context: ${context}`);
-
-    reader.onload = function () {
-            let data = Papa.parse(reader.result, { dynamicTyping: true });
-
-            // More than 10 errors might indicate it's a jpg or something non CSV
-            if (data.meta.aborted || data.errors.length > 10) {
-                console.error("Papaparse detected too many errors in file input. Do you even lift?")
-                return null;
-            }
-            
-            createChart(data.data);
-        }
-
-    // Start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsText(fileInput.files[0]);
-}
-
 // ----------------------------------------------------------------------
 // createChart - visualise strength history chart
 // Takes data array from either CSV file (papaparse) or Google Sheets API
+// We expect array grid data[][]
 // ----------------------------------------------------------------------
 function createChart(data) {
 
-            parseData(data);
+    parseData(data); // get our source data into rawLiftData
 
-            // We now have the rawLiftData from various sources.
-            // Process that data into our processedData structure
-            // Here we always default to Brzycki 1RM estimation equation (user can change in UI later)
-            processRawLiftData("Brzycki");
+    // Process rawLiftData into our processedData structure
+    // Here we default to Brzycki 1RM estimation equation (user can change in UI later)
+    processRawLiftData("Brzycki");
             
-            // Use the most popular lift to set some aesthetic x-axis padding at start and end
-            // Right now only do this once on first csv load.
-            // There is a chance loading another data set will require a new range, but unlikely.
-            padDateMin = new Date(processedData[0].graphData[0].x); 
-            padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
-            padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
-            padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
+    // Use the most popular lift to set some aesthetic x-axis padding at start and end
+    // Right now only do this once on first csv load.
+    // There is a chance loading another data set will require a new range, but unlikely.
+    padDateMin = new Date(processedData[0].graphData[0].x); 
+    padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
+    padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
+    padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
-            let canvas = document.getElementById('myChartCanvas');
-            myChart = new Chart(canvas, getChartConfig());
+    let canvas = document.getElementById('myChartCanvas');
+    myChart = new Chart(canvas, getChartConfig());
 
-            // Process achievements and display them after creation
-            processedData.forEach(visualiseAchievements, "Brzycki");
-            myChart.update();
+    // Process achievements and display them after creation
+    processedData.forEach(visualiseAchievements, "Brzycki");
+    myChart.update();
 
-            // Now we have the chart, show the chart controls box.
-            let controlsBox = document.getElementById("chartControlsBox");
-            controlsBox.style.visibility = "visible";
+    // Now we have the chart, show the html chart controls box.
+    let controlsBox = document.getElementById("chartControlsBox");
+    controlsBox.style.visibility = "visible";
 
-            // Hide the file upload button now. We could support multiple uploads in the future.
-            // FIXME: this is not working 
-            // let uploadBox = document.getElementById("uploadBox");
-            // uploadBox.style.display = "none";
-
+    // Hide the file upload button now. We could support multiple uploads in the future.
+    // FIXME: this is not working 
+    // let uploadBox = document.getElementById("uploadBox");
+    // uploadBox.style.display = "none";
 }
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata.
@@ -481,4 +458,27 @@ function toggleAchievements (context) {
     }
 
     myChart.update();
+}
+
+// Callback function for html upload file button
+// Use Papaparse to process whatever file is given via the html file picker
+function readCSV(context) {
+    let reader = new FileReader; 
+   
+    // console.log(`readCSV context: ${context}`);
+
+    reader.onload = function () {
+            let data = Papa.parse(reader.result, { dynamicTyping: true });
+
+            // More than 10 errors might indicate it's a jpg or something non CSV
+            if (data.meta.aborted || data.errors.length > 10) {
+                console.error("Papaparse detected too many errors in file input. Do you even lift?")
+                return null;
+            }
+            
+            createChart(data.data);
+        }
+
+    // Start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsText(fileInput.files[0]);
 }
