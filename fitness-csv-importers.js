@@ -64,7 +64,7 @@ function parseData(data) {
 
 // ---------------------------------------------------------------------------------
 // Array method to parse a row of Bespoke data as a liftEntry object into rawLiftData
-// Goal is to make this as flexible as possible - it will be our main use case.
+// Goal is to make this as flexible as possible - it will be our most common data format
 // ---------------------------------------------------------------------------------
 function parseBespokeRow(row, index) {
 
@@ -74,15 +74,14 @@ function parseBespokeRow(row, index) {
 
     let date = row[workout_date_COL];
 
-    // If date is null we need to use the previous date in the dataset (via lastDate global)
+    // If date is empty we need to use the previous date in the dataset (via lastDate global)
     if (date === null || date === '') date = lastDate;
         else lastDate = date; // Remember good date in case we need it in a later row
 
     let liftType = row[exercise_name_COL];
-    // If lift type is null we need to use the previous lift type (via liftType global)
+    // If lift type is empty we need to use the previous lift type (via liftType global)
     if (liftType === null || liftType === '') liftType = lastLiftType;
         else lastLiftType = liftType; // Remember good life type in case we need it in a later row
-
 
     if (!row[actual_reps_COL] || !row[actual_weight_COL]) return false; // Do they even lift?
 
@@ -98,18 +97,10 @@ function parseBespokeRow(row, index) {
 
     // Look for units inside the weight string 
     if (row[actual_weight_COL].indexOf("kg") != -1) {
-
         unitType = "kg";
-
-        // Convert weight to integer
-        // FIXME: this might lose 0.5kg amounts?
         weight = parseFloat(weight.slice(0, weight.length-2)); // Remove the units from the end
-
     } else if (row[actual_weight_COL].indexOf("lb") != -1) {
-
         unitType = "lb";
-
-        // Convert weight to integer
         weight = parseFloat(weight.slice(0, weight.length-2)); // Remove the units from the end
     } 
 
@@ -128,8 +119,6 @@ function parseBespokeRow(row, index) {
         notes: notes,
         url: url,
     });
-
-    // console.log (`Pushing liftEntry: ${JSON.stringify(liftEntry)}`);
 }
 
 // --------------------------------------------------------------------------------
@@ -149,9 +138,7 @@ function parseBtwbRow(row) {
     let result = regex.exec(row[1]); // Second column has the description - FIXME: use const column index format
     let liftType = result[0].trim();
 
-    if (liftType === "") {
-        return;
-    }
+    if (liftType === "") return;
 
     // Our app is not very interested in Crossfit WODs yet
     // The CSV has no clear indication we can use, so just exclude a few obvious non-lifts
@@ -163,8 +150,6 @@ function parseBtwbRow(row) {
     // Loop through the lifts of this session and push them all to rawLiftData
     let lifts = row[description_COL].split(/\r?\n/); // BTWB has newlines inside the one cell entry
     for (let lift of lifts) {
-        // console.log(`Procesing lift ${lift}`);
-
         // Get number of reps
         let regex = /^[0-9]+/gm;  
         let result = regex.exec(lift);
@@ -267,7 +252,7 @@ function parseBlocRow(row) {
     }
 }
 
-// Export the current rawLiftData to the user in a CSV format.
+// Export the current rawLiftData to the user in a simple CSV format.
 function exportRawCSV () {
     let csvContent = "data:text/csv;charset=utf-8,";
 

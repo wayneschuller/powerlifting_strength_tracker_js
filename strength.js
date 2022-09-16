@@ -137,6 +137,7 @@ function processRawLiftData(equation) {
     // Every element of processedData now has a graphData array
     // Let's sort each graphData array by date (x entry) so it draws lines correctly
     // (FIXME: write a custom YYYY-MM-DD compare function as 'new Date' in a sort function is frowned upon)
+    // FIXME: if we presort raw lift data, then graphdata will already be sorted
     processedData.forEach(arr => arr.graphData.sort((a,b) => new Date(a.x) - new Date(b.x)));
 
     // Also sort our processedData so the most popular lift types get charts first
