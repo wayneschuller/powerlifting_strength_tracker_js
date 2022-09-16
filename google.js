@@ -99,6 +99,7 @@ function pickerCallback(data) {
     let request = gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: ssId,
         range: 'A:Z', // grab enough columns to get everything for different data types
+        valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',
     });
 
