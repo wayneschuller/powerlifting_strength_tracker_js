@@ -12,7 +12,7 @@ const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 // ----------------------------------------------------------------------
 // createChart - visualise strength history chart
 // Takes data array from either CSV file (papaparse) or Google Sheets API
-// We expect array grid data[][]
+// We expect array format of grid data[][]
 // ----------------------------------------------------------------------
 function createChart(data) {
 
@@ -33,7 +33,7 @@ function createChart(data) {
     let canvas = document.getElementById('myChartCanvas');
     myChart = new Chart(canvas, getChartConfig());
 
-    // Process achievements and display them after creation
+    // Display achievements as chart annotations
     processedData.forEach(visualiseAchievements, "Brzycki");
     myChart.update();
 
@@ -47,7 +47,8 @@ function createChart(data) {
     // uploadBox.style.display = "none";
 }
 
-// Process the RawLiftData array of lifts into charts.js compatible graphdata.
+// Process the RawLiftData array of lifts into charts.js compatible graphdata
+// We collect only the best set per lift type per day, according to highest estimated one rep max
 // We also use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
 // Passed an string argument for equation - matching those in estimateE1RM() function.
 function processRawLiftData(equation) {
@@ -87,7 +88,6 @@ function processRawLiftData(equation) {
         
         // Main task - find the best e1rm estimate on this date
         let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight, equation);
-
         
         // Prepare our data label
         // FIXME: use the unit type in the rawLiftData[i].units, if missing fall back to global unitType
@@ -108,9 +108,9 @@ function processRawLiftData(equation) {
             // Push new lift on this new date (in chartjs friendly format)
             processedData[liftIndex].graphData.push(
                 {   
-                    x:rawLiftData[i].date, 
+                    x: rawLiftData[i].date, 
                     y: oneRepMax, 
-                    label:`${label}`, 
+                    label: `${label}`, 
                     url: url,
                     method: `${equation}`,
                     notes: notes,
@@ -144,7 +144,7 @@ function processRawLiftData(equation) {
 }
 
 
-// Generate annotation config for an achievement
+// Generate chart.js annotation plugin config data for an achievement
 function createAchievement(date, weight, text, background, datasetIndex) {
 
     return {
@@ -221,7 +221,7 @@ function estimateE1RM(reps, weight, equation) {
             return 0;
     }
 
-    if (reps == 1) return weight; // FIXME: Preserve 1 decimal? Heavy single requires no estimate! 
+    if (reps == 1) return weight; // Heavy single requires no estimate! 
 
     switch (equation) {
         case "Epley":
@@ -318,12 +318,6 @@ function getChartConfig () {
             enabled: true
         },
             mode: 'x',
-            onZoomComplete({chart}) {
-            // This update is needed to display up to date zoom level in the title.
-            // Without this, previous zoom level is displayed.
-            // The reason is: title uses the same beforeUpdate hook, and is evaluated before zoom.
-            //chart.update('none');
-            }
         }
     }
 
@@ -371,17 +365,17 @@ function getChartConfig () {
                            return(formattedDate);
                         },
                         label: function(context) {
-                            return context.raw.label; // Information about the lift
+                            return context.raw.label; // Tooltip information about the lift
                         },
                         afterLabel: function(context) {
                             let labels = [];
                             if (context.raw.notes) labels.push(context.raw.notes);
                             if (context.raw.achievements) labels.push(context.raw.achievements);
-                            return labels; // Label for achievements
+                            return labels; // Tooltip information about any achievements
                         },
                         footer: function(context) {
                             let url = context[0].raw.url;
-                            if (url) return `Click to open ${url}`; // Reminder they can click to open video
+                            if (url) return `Click to open ${url}`; // Tooltip reminder they can click to open video
                         }
                     }
                 },
@@ -429,8 +423,7 @@ function resetZoom () {
     if (myChart) myChart.resetZoom();
 }
 
-
-// Callback handlers for equation dropup menu
+// Callback handlers for equation html dropup menu
 function equationEpley () { processRawLiftData("Epley"); processedData.forEach(visualiseAchievements, "Epley"); myChart.update(); }
 function equationBrzycki () { processRawLiftData("Brzycki"); processedData.forEach(visualiseAchievements, "Brzycki"); myChart.update(); }
 function equationMcGlothin () { processRawLiftData("McGlothin"); processedData.forEach(visualiseAchievements, "McGlothin"); myChart.update(); }
