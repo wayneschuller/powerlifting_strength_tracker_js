@@ -11,7 +11,7 @@ let unitType = "lb"; // Default to freedom units
 const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
 
 // ----------------------------------------------------------------------
-// createChart - visualise strength history chart
+// createChart - visualize strength history chart
 // Takes data array from either CSV file (papaparse) or Google Sheets API
 // We expect array format of grid data[][]
 // ----------------------------------------------------------------------
@@ -35,7 +35,7 @@ function createChart(data) {
     myChart = new Chart(canvas, getChartConfig());
 
     // Display achievements as chart annotations
-    processedData.forEach(visualiseAchievements, "Brzycki");
+    processedData.forEach(visualizeAchievements, "Brzycki");
     myChart.update();
 
     // Now we have the chart, show the html chart controls box.
@@ -177,7 +177,7 @@ function createAchievement(date, weight, text, background, datasetIndex) {
 
 // array function to gather interesting achievements from processedData
 // called as a foreach method with an extra argument string for e1rm equation type (e.g.: "Epley")
-function visualiseAchievements(e, index) {
+function visualizeAchievements(e, index) {
 
     if (index >= maxChartLines) return; // We can only draw annotations where we have made lines
 
@@ -431,13 +431,13 @@ function resetZoom () {
 }
 
 // Callback handlers for equation html dropup menu
-function equationEpley () { processRawLiftData("Epley"); processedData.forEach(visualiseAchievements, "Epley"); myChart.update(); }
-function equationBrzycki () { processRawLiftData("Brzycki"); processedData.forEach(visualiseAchievements, "Brzycki"); myChart.update(); }
-function equationMcGlothin () { processRawLiftData("McGlothin"); processedData.forEach(visualiseAchievements, "McGlothin"); myChart.update(); }
-function equationLombardi () { processRawLiftData("Lombardi"); processedData.forEach(visualiseAchievements, "Lombardi"); myChart.update(); }
-function equationMayhew () { processRawLiftData("Mayhew"); processedData.forEach(visualiseAchievements, "Mayhew"); myChart.update(); }
-function equationOConner () { processRawLiftData("OConner"); processedData.forEach(visualiseAchievements, "OConner"); myChart.update(); }
-function equationWathen (context) { processRawLiftData("Wathen"); processedData.forEach(visualiseAchievements, "Wathen"); myChart.update(); }
+function equationEpley () { processRawLiftData("Epley"); processedData.forEach(visualizeAchievements, "Epley"); myChart.update(); }
+function equationBrzycki () { processRawLiftData("Brzycki"); processedData.forEach(visualizeAchievements, "Brzycki"); myChart.update(); }
+function equationMcGlothin () { processRawLiftData("McGlothin"); processedData.forEach(visualizeAchievements, "McGlothin"); myChart.update(); }
+function equationLombardi () { processRawLiftData("Lombardi"); processedData.forEach(visualizeAchievements, "Lombardi"); myChart.update(); }
+function equationMayhew () { processRawLiftData("Mayhew"); processedData.forEach(visualizeAchievements, "Mayhew"); myChart.update(); }
+function equationOConner () { processRawLiftData("OConner"); processedData.forEach(visualizeAchievements, "OConner"); myChart.update(); }
+function equationWathen (context) { processRawLiftData("Wathen"); processedData.forEach(visualizeAchievements, "Wathen"); myChart.update(); }
 
 // Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
