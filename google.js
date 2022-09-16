@@ -93,6 +93,7 @@ function pickerCallback(data) {
     console.log(`Result: ${JSON.stringify(data, null, 2)}`);
 
     ssId = data.docs[0].id; // Select the first ID they picked
+    chartTitle = `Google Sheet: ${data.docs[0].name}`;
 
     // The user chose a spreadsheet, load the values via API
     let request = gapi.client.sheets.spreadsheets.values.get({

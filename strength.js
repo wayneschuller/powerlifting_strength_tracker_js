@@ -3,6 +3,7 @@ const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
 const liftAnnotations = {}; // chart.js annotations plugin data
 let myChart; 
+let chartTitle = "Strength History";
 let minChartLines = 3; // How many lifts to show by default 
 let maxChartLines = 8; // Maximum number to graph - we will order by most popular lifts. 
 let padDateMin, padDateMax;
@@ -331,6 +332,11 @@ function getChartConfig () {
         options: {
             onClick: chartClickHandler,
             plugins: {
+                title: {
+                    text: chartTitle,
+                    display: true,
+                    font: {size: 18},
+                },
                 zoom: zoomOptions,
                 annotation: {
                     annotations: liftAnnotations,
@@ -469,7 +475,8 @@ function readCSV(context) {
                 console.error("Papaparse detected too many errors in file input. Do you even lift?")
                 return null;
             }
-            
+
+            chartTitle = fileInput.files[0].name;            
             createChart(data.data);
         }
 
