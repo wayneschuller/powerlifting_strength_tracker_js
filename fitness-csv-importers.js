@@ -68,9 +68,7 @@ function parseData(data) {
 // ---------------------------------------------------------------------------------
 function parseBespokeRow(row, index) {
 
-    // console.log(`Bespoke row ${index}: ${JSON.stringify(row)}`);
-
-    if (row[actual_reps_COL] === "Reps") return false; // Probably header row
+    if (!row[actual_reps_COL] || row[actual_reps_COL] === "Reps") return false; // Bad row
 
     let date = row[workout_date_COL];
 
@@ -128,10 +126,7 @@ function parseBtwbRow(row) {
 
     // console.log(`parseBtwbRow: ${JSON.stringify(row)}`);
 
-    if (!row || row[0] === null) {
-            // console.log(`processBtwbRow skipping bad row: ${JSON.stringify(row)}`);
-            return; 
-    }
+    if (!row || row[0] === null) return; 
 
     // Find the exercise name AKA type of lift in this row
     let regex = /[a-zA-Z ]*/gm;
