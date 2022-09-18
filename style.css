@@ -31,7 +31,7 @@
   margin-left: auto; /* right justify */
 }
 
-.uploadBox {
+#uploadBox {
   width: 90%;
   padding: 10px;
 }

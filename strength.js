@@ -43,9 +43,8 @@ function createChart(data) {
     controlsBox.style.visibility = "visible";
 
     // Hide the file upload button now. We could support multiple uploads in the future.
-    // FIXME: this is not working 
-    // let uploadBox = document.getElementById("uploadBox");
-    // uploadBox.style.display = "none";
+    let uploadBox = document.getElementById("uploadBox");
+    uploadBox.style.display = "none";
 }
 
 // Process the RawLiftData array of lifts into charts.js compatible graphdata
