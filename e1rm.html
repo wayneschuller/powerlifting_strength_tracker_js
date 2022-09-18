@@ -30,10 +30,8 @@
 
     <div class="chartCard">
         <div class="chartBox">
-                <canvas id="myChartCanvas"></canvas>
-
+            <canvas id="myChartCanvas"></canvas>
             <div class="chartControlsBox" id="chartControlsBox">
-
                 <span class="leftControls">
                     <div class="dropup">
                         <button class="dropbtn" id="equationButton">Choose 1RM Equation</button>
@@ -48,14 +46,13 @@
                             </div>
                     </div>
                 </span>
-                
                 <span class="rightControls">
                     <button id="toggleAchievements" type="button" value="Hide" onclick="toggleAchievements()">Hide Achievements</button> 
                     <button id="export" type="button" onclick="exportRawCSV()">Export Raw CSV</button> 
                     <button id="reset" type="button" onclick="resetZoom()">Reset Zoom</button> 
                 </span>
             </div> 
-    </div>
+        </div>
     </div>
 
     <div class="uploadBox">
@@ -69,7 +66,7 @@
         var fileInput = document.getElementById("fileUploadButton");
         fileInput.addEventListener('change', readCSV);
     </script>
-<p> Here is a sample output: <a href="sample_chart.jpg"> <img src="sample_chart.jpg" width="200px"></a></p>
+<p>Here is a sample output: <a href="sample_chart.jpg"> <img src="sample_chart.jpg" width="200px"></a></p>
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
 
 </body>
