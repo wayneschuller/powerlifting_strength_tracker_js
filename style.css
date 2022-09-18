@@ -22,17 +22,17 @@
 
 .chartControlsBox {
     padding: 5px 0px 0px 0px;
-    /* display: inline-block; */
+    display: flex; 
+    justify-content: space-between;
     visibility: hidden;
 }
 
 .leftControls {
-  float: left;
   padding: 0px 5px 0px 0px;
 }
 
 .rightControls {
-  float: right;
+  justify-self: end;
   padding: 0px 0px 0px 5px;
 }
 
@@ -45,13 +45,11 @@
     text-align: right;
 }
 
-/* The container <div> - needed to position the dropup content */
 .dropup {
   position: relative;
   display: inline-block;
 }
 
-/* Dropup Content (Hidden by Default) */
 .dropup-content {
   display: none;
   position: absolute;
@@ -65,7 +63,7 @@
 .dropup:checked .dropup-content {
   display: none;
 }
-/* Show the dropdown menu on hover */
+
 .dropup:hover .dropup-content {
   display: block;
 }

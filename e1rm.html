@@ -32,7 +32,7 @@
         <div class="chartBox">
             <canvas id="myChartCanvas"></canvas>
             <div class="chartControlsBox" id="chartControlsBox">
-                <span class="leftControls">
+                <div class="leftControls">
                     <div class="dropup">
                         <button class="dropbtn" id="equationButton">Choose 1RM Equation</button>
                         <div class="dropup-content">
@@ -45,12 +45,12 @@
                             <a onclick="equationWathen()">Wathen</a>
                             </div>
                     </div>
-                </span>
-                <span class="rightControls">
+                </div>
+                <div class="rightControls">
                     <button id="toggleAchievements" type="button" value="Hide" onclick="toggleAchievements()">Hide Achievements</button> 
                     <button id="export" type="button" onclick="exportRawCSV()">Export Raw CSV</button> 
                     <button id="reset" type="button" onclick="resetZoom()">Reset Zoom</button> 
-                </span>
+                </div>
             </div> 
         </div>
     </div>
