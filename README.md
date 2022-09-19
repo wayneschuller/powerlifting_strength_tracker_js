@@ -2,12 +2,15 @@
 ## A javascript based strength history visualiser 
 
 Click here to use the deployed version: https://wayneschuller.github.io/powerlifting_strength_tracker_js/e1rm.html
-You can then click on the file chooser to select a CSV file of your lifts.
 
-Currently supported CSV formats:
+You can then click on the file chooser to select a CSV file of your lifts or load from Google Sheets (you have to give permission and get past the google warnings)
+
+We encourage owning your own data using Google Sheets. Here is our recommended layout style: https://docs.google.com/spreadsheets/d/14J9z9iJBCeJksesf3MdmpTUmo2TIckDxIQcTx1CPEO0/edit#gid=0  
+
+We can also import data exports from:
 - [Barbell Logic](https://barbell-logic.com/) client web app
 - [Beyond the Whiteboard](https://beyondthewhiteboard.com/) web app
-- more file formats coming soon including a DIY format
+- Please send sample exports from other apps and we will add them
 
 The code will use charts.js to generate a time based graph of your lifts based on an estimated one rep max:
 ![20220904_squat](https://user-images.githubusercontent.com/1592295/188308389-69f136b0-9e68-45b7-bac0-60fda94a9e06.png)
