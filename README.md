@@ -1,5 +1,5 @@
 # powerlifting_strength_tracker_js
-## A javascript based strength history visualiser 
+## A javascript based strength history vizualiser 
 
 Click here to use the deployed version: https://wayneschuller.github.io/powerlifting_strength_tracker_js/e1rm.html
 
