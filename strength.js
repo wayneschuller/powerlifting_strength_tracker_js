@@ -54,62 +54,50 @@ function createChart(data) {
 // Passed an string argument for equation - matching those in estimateE1RM() function.
 function processRawLiftData(equation) {
 
-    for (let i = 0; i < rawLiftData.length; i++) {
+    for (const lift of rawLiftData) {
 
-        let liftIndex = processedData.findIndex(lift => lift.name === rawLiftData[i].name);
-
-        if (liftIndex === -1) { 
-            // Create a processedLift data structure for this new lift type
-            let processedLiftType = { 
-                name: rawLiftData[i].name, 
-                graphData: [], 
-                best5RM: null, 
-                best3RM: null, 
-                best1RM: null 
-            }; 
-        liftIndex = processedData.push(processedLiftType) - 1; 
-        } 
+        let liftIndex = getProcessedLiftIndex(lift.name);
 
         // Side task - collect some achievements for this lift type
         // Assuming that the data is sorted reverse chronological, we award the achievements to the oldest lift.
-        switch (rawLiftData[i].reps) {
+        switch (lift.reps) {
             case 5:
-                if (processedData[liftIndex].best5RM === null || rawLiftData[i].weight >= processedData[liftIndex].best5RM.weight) 
-                        processedData[liftIndex].best5RM = rawLiftData[i];
+                if (processedData[liftIndex].best5RM === null || lift.weight >= processedData[liftIndex].best5RM.weight) 
+                        processedData[liftIndex].best5RM = lift;
                 break;
             case 3:
-                if (processedData[liftIndex].best3RM === null || rawLiftData[i].weight >= processedData[liftIndex].best3RM.weight) 
-                        processedData[liftIndex].best3RM = rawLiftData[i];
+                if (processedData[liftIndex].best3RM === null || lift.weight >= processedData[liftIndex].best3RM.weight) 
+                        processedData[liftIndex].best3RM = lift;
                 break;
             case 1:
-                if (processedData[liftIndex].best1RM === null || rawLiftData[i].weight >= processedData[liftIndex].best1RM.weight) 
-                        processedData[liftIndex].best1RM = rawLiftData[i];
+                if (processedData[liftIndex].best1RM === null || lift.weight >= processedData[liftIndex].best1RM.weight) 
+                        processedData[liftIndex].best1RM = lift;
                 break;
         }
         
         // Main task - find the best e1rm estimate on this date
-        let oneRepMax = estimateE1RM(rawLiftData[i].reps, rawLiftData[i].weight, equation);
+        let oneRepMax = estimateE1RM(lift.reps, lift.weight, equation);
         
         // Prepare our data label
-        // FIXME: use the unit type in the rawLiftData[i].units, if missing fall back to global unitType
+        // FIXME: use the unit type in the lift.units, if missing fall back to global unitType
         let label = '';
-        if (rawLiftData[i].reps === 1)
-            label = `Lifted 1@${rawLiftData[i].weight}${unitType}.`;
+        if (lift.reps === 1)
+            label = `Lifted 1@${lift.weight}${unitType}.`;
         else
-            label = `Potential 1@${oneRepMax}${unitType} from ${rawLiftData[i].reps}@${rawLiftData[i].weight}${unitType}.`;
+            label = `Potential 1@${oneRepMax}${unitType} from ${lift.reps}@${lift.weight}${unitType}.`;
 
-        let url = rawLiftData[i].url;
+        let url = lift.url;
         if (!url) url = "";
 
-        let notes = rawLiftData[i].notes;
+        let notes = lift.notes;
 
         // Do we already have any processed data on this date?
-        let dateIndex = processedData[liftIndex].graphData.findIndex(lift => lift.x === rawLiftData[i].date);
+        let dateIndex = processedData[liftIndex].graphData.findIndex(processedLift => processedLift.x === lift.date);
         if (dateIndex === -1) {
             // Push new lift on this new date (in chartjs friendly format)
             processedData[liftIndex].graphData.push(
                 {   
-                    x: rawLiftData[i].date, 
+                    x: lift.date, 
                     y: oneRepMax, 
                     label: `${label}`, 
                     url: url,
@@ -124,7 +112,7 @@ function processRawLiftData(equation) {
                 processedData[liftIndex].graphData[dateIndex].notes = notes;
                 processedData[liftIndex].graphData[dateIndex].method = equation;
 
-                // FIXME: if we have a URL in each, choose the non-BLOC one
+                // FIXME: if we have a URL in each from different data sources, choose the non-BLOC one
                 processedData[liftIndex].graphData[dateIndex].url = url;
             } else continue; // Weaker lift, duplicate date. Ignore and go to the next item in the rawLiftData loop
         } 
@@ -475,4 +463,26 @@ function readCSV(context) {
 
     // Start reading the file. When it is done, calls the onload event defined above.
     reader.readAsText(fileInput.files[0]);
+}
+
+
+// Return the index for the liftType string in our processedData 
+// If the lift doesn't exist in processedData, create one. 
+function getProcessedLiftIndex (liftType) {
+
+    let liftIndex = processedData.findIndex(lift => lift.name === liftType);
+
+    if (liftIndex === -1) { 
+        // Create a processedLift data structure for this new lift type
+        let processedLiftType = { 
+            name: liftType, 
+            graphData: [], 
+            best5RM: null, 
+            best3RM: null, 
+            best1RM: null 
+        }; 
+    liftIndex = processedData.push(processedLiftType) - 1; 
+    } 
+
+    return liftIndex;
 }
