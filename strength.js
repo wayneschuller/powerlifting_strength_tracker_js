@@ -28,7 +28,7 @@ function createChart(data) {
     // There is a chance loading another data set will require a new range, but unlikely.
     padDateMin = new Date(processedData[0].graphData[0].x); 
     padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
-    padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
+    padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length - 1].x); 
     padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
     // Create the chart.js chart
@@ -253,7 +253,7 @@ function createDataSets(min, max) {
         let color;
         const randomColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
 
-        color = (i >= min) ? randomColor : color = basicColors[i]; 
+        color = (i >= min) ? randomColor : basicColors[i]; 
 
         if (i >= min) hidden = true; // Initially hide the lines above the minimum
 
@@ -286,8 +286,8 @@ function getChartConfig () {
     const zoomOptions = {
         limits: {
             // FIXME: we can work out sensible values from our data set and unit type
-            x: {min: 'original', max: 'original', minRange: 50},
-            y: {min: 'original', max: 'original', minRange: 200},
+            x: { min: 'original', max: 'original', minRange: 50 },
+            y: { min: 'original', max: 'original', minRange: 200 },
         },
         pan: {
             enabled: true,
@@ -301,8 +301,8 @@ function getChartConfig () {
             enabled: true
         },
             mode: 'x',
-        }
-    }
+        },
+    };
 
     Chart.defaults.font.family = 'Catamaran';
 
@@ -316,7 +316,7 @@ function getChartConfig () {
                 title: {
                     text: chartTitle,
                     display: true,
-                    font: {size: 18},
+                    font: { size: 18 },
                 },
                 zoom: zoomOptions,
                 annotation: {
@@ -330,9 +330,9 @@ function getChartConfig () {
                         // Mark heavy singles in bold data labels, and the e1rm estimate data labels as italic
                         let liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
                         if (liftSingle === -1) 
-                            return { weight: 'bold', size: 13, };
+                            return { weight: 'bold', size: 13 };
                         else 
-                            return { style: 'italic', size: 12, };
+                            return { style: 'italic', size: 12 };
                     },
                     align: 'end',
                     anchor: 'end',
@@ -340,8 +340,8 @@ function getChartConfig () {
                 tooltip: {
                     enabled: true,
                     position: 'nearest',
-                    titleFont: { size:14 },
-                    bodyFont: { size:14 },
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 14 },
                     callbacks: {
                         title: function(context) {
                             const d = new Date(context[0].parsed.x)
@@ -349,7 +349,7 @@ function getChartConfig () {
                                 year:   'numeric',
                                 month:  'long',
                                 day:   'numeric',
-                            })
+                            });
                            return(formattedDate);
                         },
                         label: function(context) {
@@ -387,7 +387,7 @@ function getChartConfig () {
                 yAxis: {
                     suggestedMin: 0, 
                     ticks: {
-                        font: {size: 15},
+                        font: { size: 15 },
                         callback: function (value) {
                             return value + unitType;
                         },
