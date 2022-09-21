@@ -31,10 +31,11 @@ function createChart(data) {
     padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length-1].x); 
     padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
+    // Create the chart.js chart
     let canvas = document.getElementById('myChartCanvas');
     myChart = new Chart(canvas, getChartConfig());
 
-    // Display achievements as chart annotations
+    // Display achievements using chart annotations plugin
     processedData.forEach(visualizeAchievements, "Brzycki");
     myChart.update();
 
