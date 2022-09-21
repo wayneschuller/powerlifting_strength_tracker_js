@@ -19,20 +19,20 @@ let gisInited = false;
  * Callback after api.js is loaded.
  */
 function gapiLoaded() {
-    gapi.load('picker', intializePicker);
-    gapi.load('client', intializeGapiClient);
+  gapi.load('picker', intializePicker);
+  gapi.load('client', intializeGapiClient);
 }
 
 /**
  * Callback after Google Identity Services are loaded.
  */
 function gisLoaded() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: '', // defined later
-    });
-    gisInited = true;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: '', // defined later
+  });
+  gisInited = true;
 }
 
 /**
@@ -40,16 +40,16 @@ function gisLoaded() {
  * discovery doc to initialize the API.
  */
 function intializePicker() {
-    pickerInited = true;
+  pickerInited = true;
 }
 
 
 function intializeGapiClient() {
-      gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
+    gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+    gapiInited = true;
 }
 
 
@@ -57,56 +57,56 @@ function intializeGapiClient() {
  *  Sign in the user upon button click and call createPicker to choose a google sheet
  */
 function loadGooglePicker() {
-    tokenClient.callback = async (response) => {
-      if (response.error !== undefined) {
-        throw (response);
-      }
-      accessToken = response.access_token;
-      await createPicker();
-    };
-
-    if (accessToken === null) {
-      // Prompt the user to select a Google Account and ask for consent to share their data
-      // when establishing a new session.
-      tokenClient.requestAccessToken({prompt: 'consent'});
-    } else {
-      // Skip display of account chooser and consent dialog for an existing session.
-      tokenClient.requestAccessToken({prompt: ''});
+  tokenClient.callback = async (response) => {
+    if (response.error !== undefined) {
+    throw (response);
     }
+    accessToken = response.access_token;
+    await createPicker();
+  };
+
+  if (accessToken === null) {
+    // Prompt the user to select a Google Account and ask for consent to share their data
+    // when establishing a new session.
+    tokenClient.requestAccessToken({prompt: 'consent'});
+  } else {
+    // Skip display of account chooser and consent dialog for an existing session.
+    tokenClient.requestAccessToken({prompt: ''});
+  }
 }
 
 function createPicker() {
   const picker = new google.picker.PickerBuilder()
-        .setDeveloperKey(API_KEY)
-        .setAppId(APP_ID)
-        .setOAuthToken(accessToken)
-        .addView(google.picker.ViewId.SPREADSHEETS)
-        .setCallback(pickerCallback)
-        .build();
-    picker.setVisible(true);
+    .setDeveloperKey(API_KEY)
+    .setAppId(APP_ID)
+    .setOAuthToken(accessToken)
+    .addView(google.picker.ViewId.SPREADSHEETS)
+    .setCallback(pickerCallback)
+    .build();
+  picker.setVisible(true);
 }
 
 // Get the google sheet the user picked and load the columns in the first sheet
 function pickerCallback(data) {
-    if (data.action !== google.picker.Action.PICKED) return; // nothing picked
+  if (data.action !== google.picker.Action.PICKED) return; // nothing picked
 
-    console.log(`Result: ${JSON.stringify(data, null, 2)}`);
+  console.log(`Result: ${JSON.stringify(data, null, 2)}`);
 
-    ssId = data.docs[0].id; // Select the first ID they picked
-    chartTitle = `Google Sheet: ${data.docs[0].name}`;
+  ssId = data.docs[0].id; // Select the first ID they picked
+  chartTitle = `Google Sheet: ${data.docs[0].name}`;
 
-    // The user chose a spreadsheet, load the values via API
-    let request = gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: ssId,
-        range: 'A:Z', // grab enough columns to get everything for different data types
-        valueRenderOption: 'UNFORMATTED_VALUE',
-        dateTimeRenderOption: 'FORMATTED_STRING',
-    });
+  // The user chose a spreadsheet, load the values via API
+  let request = gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: ssId,
+    range: 'A:Z', // grab enough columns to get everything for different data types
+    valueRenderOption: 'UNFORMATTED_VALUE',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  });
 
-    request.then(function(response) {
-        // We have the google sheet data
-        createChart(response.result.values);
-    }, function(reason) {
-        console.error(`error: ${reason.result.error.message}`);
-    });
+  request.then(function(response) {
+    // We have the google sheet data
+    createChart(response.result.values);
+  }, function(reason) {
+    console.error(`error: ${reason.result.error.message}`);
+  });
 }
