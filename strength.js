@@ -146,7 +146,7 @@ function processRawLiftData(equation) {
 
 
 // Generate chart.js annotation plugin config data for an achievement
-function createAchievement(date, weight, text, background, datasetIndex) {
+function createAchievementAnnotation(date, weight, text, background, datasetIndex) {
 
     return {
             type: 'label',
@@ -186,7 +186,7 @@ function visualizeAchievements(e, index) {
 
     if (e.best1RM) {
         // Set point annotation for .best1RM
-        liftAnnotations[`${e.name}_best_1RM`] = createAchievement(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
+        liftAnnotations[`${e.name}_best_1RM`] = createAchievementAnnotation(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
@@ -196,7 +196,7 @@ function visualizeAchievements(e, index) {
     if (e.best3RM) {
         // Set point annotation for .best3RM
         let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight, equation);
-        liftAnnotations[`${e.name}_best_3RM`] = createAchievement(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_3RM`] = createAchievementAnnotation(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
@@ -206,7 +206,7 @@ function visualizeAchievements(e, index) {
     if (e.best5RM) {
         // Set point annotation for .best5RM
         let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight, equation);
-        liftAnnotations[`${e.name}_best_5RM`] = createAchievement(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);  
+        liftAnnotations[`${e.name}_best_5RM`] = createAchievementAnnotation(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);  
 
         // Update the label with some encouragement 
         let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
@@ -247,13 +247,6 @@ function estimateE1RM(reps, weight, equation) {
             return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula is our default
             break;
     }
-}
-
-function value(ctx, datasetIndex, index, prop) {
-    const meta = ctx.chart.getDatasetMeta(datasetIndex);
-    // console.log(JSON.stringify(meta));
-    const parsed = meta.controller.getParsed(index);
-    return parsed ? parsed[prop] : NaN;
 }
 
 // Push our first num processedData into chart.js datasets 
