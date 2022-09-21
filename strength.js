@@ -1,7 +1,7 @@
 // Global variables
 const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements 
-const liftAnnotations = {}; // chart.js annotations plugin data
+const liftAnnotations = {}; // chart.js annotations plugin config for special achivements such as 1RM, 3RM, 5RM.
 let myChart; 
 let chartTitle = "Strength History";
 let minChartLines = 3; // How many lifts to show by default 
@@ -48,7 +48,7 @@ function createChart(data) {
     uploadBox.style.display = "none";
 }
 
-// Process the RawLiftData array of lifts into charts.js compatible graphdata
+// Process the rawLiftData array of lifts into processedData (AKA charts.js compatible graph data)
 // We collect only the best set per lift type per day, according to highest estimated one rep max
 // We also use this function to collect achievements to share with the user (5RM, 1RM per lift etc)
 // Passed an string argument for equation - matching those in estimateE1RM() function.
