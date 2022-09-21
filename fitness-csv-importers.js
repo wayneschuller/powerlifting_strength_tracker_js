@@ -15,7 +15,7 @@ let lastLiftType = "Tik Tok Dancing";
 // ----------------------------------------------------------------------
 function parseData(data) {
 
-  let columnNames = data[0];
+  const columnNames = data[0];
 
   // Look for distinctive BTWB CSV data columns - no one else will have a Pukie column
   if (columnNames[0] === "Date" && columnNames[4] === "Pukie") {
@@ -88,7 +88,7 @@ function parseBespokeRow(row, index) {
     // return;
   }
 
-  let reps = row[actual_reps_COL];
+  const reps = row[actual_reps_COL];
 
   // Default will be to assume a raw number that is in pounds
   let weight = row[actual_weight_COL];
@@ -129,21 +129,18 @@ function parseBtwbRow(row) {
   if (!row || row[0] === null) return; 
 
   // Find the exercise name AKA type of lift in this row
-  let regex = /[a-zA-Z ]*/gm;
-  let result = regex.exec(row[1]); // Second column has the description - FIXME: use const column index format
-  let liftType = result[0].trim();
+  const regex = /[a-zA-Z ]*/gm;
+  const result = regex.exec(row[1]); // Second column has the description - FIXME: use const column index format
+  const liftType = result[0].trim();
 
   if (liftType === "") return;
 
   // Our app is not very interested in Crossfit WODs yet
   // The CSV has no clear indication we can use, so just exclude a few obvious non-lifts
-  if (liftType === "Every" || liftType === "FT" || liftType === "AMRAP" || liftType === "Chipper") {
-    console.log(`Excluding non-lift: ${liftType}`);
-    return;
-  }
+  if (liftType === "Every" || liftType === "FT" || liftType === "AMRAP" || liftType === "Chipper") return;
 
   // Loop through the lifts of this session and push them all to rawLiftData
-  let lifts = row[description_COL].split(/\r?\n/); // BTWB has newlines inside the one cell entry
+  const lifts = row[description_COL].split(/\r?\n/); // BTWB has newlines inside the one cell entry
   for (let lift of lifts) {
     // Get number of reps
     let regex = /^[0-9]+/gm;  
@@ -163,7 +160,7 @@ function parseBtwbRow(row) {
 
     result = regex.exec(lift);
     if (!result) continue;
-    let curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
+    const curWeight = parseFloat(result[0].slice(0, result[0].length-2)); // Remove the units (kg or lb) from the end
     if (curWeight == 0) continue;
 
     let notes = row[notes_COL]; if (!notes) notes = '';
@@ -219,7 +216,7 @@ function parseBlocRow(row) {
 
   unitType = row[units_COL]; // Record the units type global for later. (we assume it won't change in the CSV)
 
-  let liftUrl = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
+  const liftUrl = `https://www.barbelllogic.app/workout/${row[workout_id_COL]}`;
 
   let liftType = row[exercise_name_COL];
 
@@ -228,7 +225,7 @@ function parseBlocRow(row) {
   // Expand BLOC sets into separate liftEntry tuples
   // This makes no difference to the graph, but it benefits a user wanting to convert their BLOC data to our bespoke format
   // It may help with some achievements and tonnage count in a future feature
-  let sets = 3;
+  let sets = 1;
   if (row[assigned_sets_COL] && row[assigned_sets_COL] > 1) sets = row[assigned_sets_COL];
   if (row[actual_sets_COL] && row[actual_sets_COL] > 1) sets = row[actual_sets_COL];
 

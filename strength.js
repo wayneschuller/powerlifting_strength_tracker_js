@@ -56,7 +56,7 @@ function processRawLiftData(equation) {
 
   for (const lift of rawLiftData) {
 
-  let liftIndex = getProcessedLiftIndex(lift.name);
+  const liftIndex = getProcessedLiftIndex(lift.name);
 
   // Side task - collect some achievements for this lift type
   // Assuming that the data is sorted reverse chronological, we award the achievements to the oldest lift.
@@ -89,8 +89,6 @@ function processRawLiftData(equation) {
     let url = lift.url;
     if (!url) url = "";
 
-    let notes = lift.notes;
-
     // Do we already have any processed data on this date?
     let dateIndex = processedData[liftIndex].graphData.findIndex(processedLift => processedLift.x === lift.date);
     if (dateIndex === -1) {
@@ -102,14 +100,14 @@ function processRawLiftData(equation) {
         label: `${label}`,
         url: url,
         method: `${equation}`,
-        notes: notes,
+        notes: lift.notes,
       });
     } else {
       // Update old lift if we are changing equation OR the e1RM is bigger
       if (processedData[liftIndex].graphData[dateIndex].method != equation || oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
         processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
         processedData[liftIndex].graphData[dateIndex].label = label;
-        processedData[liftIndex].graphData[dateIndex].notes = notes;
+        processedData[liftIndex].graphData[dateIndex].notes = lift.notes;
         processedData[liftIndex].graphData[dateIndex].method = equation;
 
         // FIXME: if we have a URL in each from different data sources, choose the non-BLOC one
@@ -177,7 +175,7 @@ function visualizeAchievements(e, index) {
     liftAnnotations[`${e.name}_best_1RM`] = createAchievementAnnotation(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
 
     // Update the label with some encouragement
-    let dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
+    const dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
     e.graphData[dateIndex].achievements = `Best ${e.name} 1RM of all time!`;
   }
 
@@ -187,7 +185,7 @@ function visualizeAchievements(e, index) {
     liftAnnotations[`${e.name}_best_3RM`] = createAchievementAnnotation(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);
 
     // Update the label with some encouragement
-    let dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
+    const dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
     e.graphData[dateIndex].achievements = `Best ${e.name} 3RM of all time!`;
   }
 
@@ -197,7 +195,7 @@ function visualizeAchievements(e, index) {
     liftAnnotations[`${e.name}_best_5RM`] = createAchievementAnnotation(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);
 
     // Update the label with some encouragement
-    let dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
+    const dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
     e.graphData[dateIndex].achievements = `Best ${e.name} 5RM of all time!`;
   };
 }
@@ -242,7 +240,7 @@ function estimateE1RM(reps, weight, equation) {
 // min = the default number that display (the rest will begin hidden)
 function createDataSets(min, max) {
 
-  let dataSets = [];
+  const dataSets = [];
 
   let hidden = false;
 
@@ -327,7 +325,7 @@ function getChartConfig () {
             },
           font: function(context) {
             // Mark heavy singles in bold data labels, and the e1rm estimate data labels as italic
-            let liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
+            const liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
             if (liftSingle === -1)
               return { weight: 'bold', size: 13 };
             else
@@ -355,13 +353,13 @@ function getChartConfig () {
               return context.raw.label; // Tooltip information about the lift
             },
             afterLabel: function(context) {
-              let labels = [];
+              const labels = [];
               if (context.raw.notes) labels.push(context.raw.notes);
               if (context.raw.achievements) labels.push(context.raw.achievements);
               return labels; // Tooltip information about any achievements
             },
             footer: function(context) {
-              let url = context[0].raw.url;
+              const url = context[0].raw.url;
               if (url) return `Click to open ${url}`; // Tooltip reminder they can click to open video
             }
           }
@@ -401,7 +399,7 @@ function getChartConfig () {
 // Used to detect a click on a graph point and open URL in the data.
 function chartClickHandler (event, item) {
   if (item && item.length > 0) {
-    let url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
+    const url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
     if (url) window.open(url);
   }
 }
@@ -421,7 +419,7 @@ function equationWathen (context) { processRawLiftData("Wathen"); processedData.
 
 // Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
-  let toggleAchInput = document.getElementById("toggleAchievements");
+  const toggleAchInput = document.getElementById("toggleAchievements");
   if (toggleAchInput.value == "Hide") {
     toggleAchInput.value = "Show";
     toggleAchInput.innerHTML = "Show Achievements";
@@ -443,10 +441,10 @@ function toggleAchievements (context) {
 // Callback function for html upload file button
 // Use Papaparse to process whatever file is given via the html file picker
 function readCSV(context) {
-  let reader = new FileReader;
+  const reader = new FileReader;
 
   reader.onload = function () {
-    let data = Papa.parse(reader.result, { dynamicTyping: true });
+    const data = Papa.parse(reader.result, { dynamicTyping: true });
 
     // More than 10 errors might indicate it's a jpg or something non CSV
     if (data.meta.aborted || data.errors.length > 10) {
