@@ -14,6 +14,7 @@ let accessToken = null;
 let pickerInited = false;
 let gapiInited = false;
 let gisInited = false;
+let ssId;
 
 /**
  * Callback after api.js is loaded.
@@ -95,6 +96,12 @@ function pickerCallback(data) {
   ssId = data.docs[0].id; // Select the first ID they picked
   chartTitle = `Google Sheet: ${data.docs[0].name}`;
 
+  readGoogleSheetsData(ssId);
+}
+
+function readGoogleSheetsData (ssId) {
+  console.log(`Ask google sheets for data.`); 
+
   // The user chose a spreadsheet, load the values via API
   let request = gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: ssId,
@@ -106,6 +113,11 @@ function pickerCallback(data) {
   request.then(function(response) {
     // We have the google sheet data
     createChart(response.result.values);
+
+    // Call this function again in 20 seconds
+    setTimeout(function run() { 
+      readGoogleSheetsData(ssId);
+    }, 20000);
   }, function(reason) {
     console.error(`error: ${reason.result.error.message}`);
   });

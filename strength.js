@@ -2,7 +2,7 @@
 const rawLiftData = []; // Every unique lift in the source data
 const processedData = []; // Array with one element per lift type of charts.js graph friendly data and special achievements
 const liftAnnotations = {}; // chart.js annotations plugin config for special achivements such as 1RM, 3RM, 5RM.
-let myChart;
+let myChart = null;
 let chartTitle = "Strength History";
 let minChartLines = 3; // How many lifts to show by default
 let maxChartLines = 8; // Maximum number to graph - we will order by most popular lifts.
@@ -23,6 +23,15 @@ function createChart(data) {
   // Here we default to Brzycki 1RM estimation equation (user can change in UI later)
   processRawLiftData("Brzycki");
 
+  // Create the chart.js annotations config
+  processedData.forEach(visualizeAchievements, "Brzycki");
+
+  // If we already have a chart, just update it.
+  if (myChart !== null) {
+    myChart.update();
+    return;
+  }
+
   // Use the most popular lift to set some aesthetic x-axis padding at start and end
   // Right now only do this once on first csv load.
   // There is a chance loading another data set will require a new range, but unlikely.
@@ -35,15 +44,11 @@ function createChart(data) {
   let canvas = document.getElementById('myChartCanvas');
   myChart = new Chart(canvas, getChartConfig());
 
-  // Display achievements using chart annotations plugin
-  processedData.forEach(visualizeAchievements, "Brzycki");
-  myChart.update();
-
   // Now we have the chart, show the html chart controls box.
   let controlsBox = document.getElementById("chartControlsBox");
   controlsBox.style.visibility = "visible";
 
-  // Hide the file upload button now. We could support multiple uploads in the future.
+  // Hide the file upload button now. We could support later extra uploads in the future.
   let uploadBox = document.getElementById("uploadBox");
   uploadBox.style.display = "none";
 }
