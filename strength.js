@@ -148,7 +148,7 @@ function processRawLiftData(equation) {
   processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
   // Find achievements and put on chart
-  processAchievements("Brzycki");
+  //processAchievements("Brzycki");
 }
 
 // Find interesting achievements and add to chart annotation config
