@@ -9,6 +9,7 @@ let maxChartLines = 8; // Maximum number to graph - we will order by most popula
 let padDateMin, padDateMax;
 let unitType = "lb"; // Default to freedom units
 const basicColors = ['#ae2012', '#ee9b00', '#03045e', '#0a9396'];
+let equation = "Brzycki"; // Our favourite preferred equation - it does not over promise
 
 // ----------------------------------------------------------------------
 // createChart - visualize strength history chart
@@ -20,8 +21,7 @@ function createChart(data) {
   parseData(data); // get our source data into rawLiftData
 
   // Process rawLiftData into our processedData structure
-  // Here we default to Brzycki 1RM estimation equation (user can change in UI later)
-  processRawLiftData("Brzycki");
+  processRawLiftData();
 
   // If we already have a chart, just update it.
   if (myChart !== null) {
@@ -52,15 +52,14 @@ function createChart(data) {
 
 // Process the rawLiftData array of lifts into processedData (AKA charts.js compatible graph data)
 // We collect only the best set per lift type per day, according to highest estimated one rep max
-// Passed an string argument for equation - matching those in estimateE1RM() function.
-function processRawLiftData(equation) {
+function processRawLiftData() {
 
   for (const lift of rawLiftData) {
 
   const liftIndex = getProcessedLiftIndex(lift.name);
 
   // Main task - find the best e1rm estimate on this date
-  let oneRepMax = estimateE1RM(lift.reps, lift.weight, equation);
+  let oneRepMax = estimateE1RM(lift.reps, lift.weight);
 
   // Prepare our data label
   // FIXME: use the unit type in the lift.units, if missing fall back to global unitType
@@ -148,12 +147,11 @@ function processRawLiftData(equation) {
   processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
   // Find achievements and put on chart
-  processAchievements("Brzycki");
+  processAchievements();
 }
 
 // Find interesting achievements and add to chart annotation config
-// We pass through the equation type as it is needed to know the label y position
-function processAchievements(equation) {
+function processAchievements() {
 
   // Clear old achievements from our data and from the chart annotations config
   processedData.forEach(liftType => {
@@ -201,7 +199,7 @@ function processAchievements(equation) {
 
     if (e.best3RM) {
       // Set point annotation for .best3RM
-      let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight, equation);
+      let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
       liftAnnotations[`${e.name}_best_3RM`] = createAchievementAnnotation(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);
 
       // Update the label with some encouragement
@@ -211,7 +209,7 @@ function processAchievements(equation) {
 
     if (e.best5RM) {
       // Set point annotation for .best5RM
-      let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight, equation);
+      let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
       liftAnnotations[`${e.name}_best_5RM`] = createAchievementAnnotation(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);
 
       // Update the label with some encouragement
@@ -251,7 +249,7 @@ function createAchievementAnnotation(date, weight, text, background, datasetInde
 
 // Return a rounded 1 rep max
 // For theory see: https://en.wikipedia.org/wiki/One-repetition_maximum
-function estimateE1RM(reps, weight, equation) {
+function estimateE1RM(reps, weight) {
   if (reps == 0) {
       console.error("Somebody passed 0 reps... naughty.");
       return 0;
@@ -278,8 +276,11 @@ function estimateE1RM(reps, weight, equation) {
     case "Wathen":
       return Math.round(100 * weight/(48.8+53.8*(Math.pow(Math.E, -0.075*reps))));
       break;
+    case "Brzycki":
+      return Math.round(weight/(1.0278-0.0278*reps)); 
+      break;
     default:
-      return Math.round(weight/(1.0278-0.0278*reps)); // Brzycki formula is our default
+      return Math.round(weight/(1.0278-0.0278*reps)); // Repeat Brzycki formula as a default here
       break;
   }
 }
@@ -477,13 +478,13 @@ function resetZoom () {
 }
 
 // Callback handlers for equation html dropup menu
-function equationEpley () { processRawLiftData("Epley"); myChart.update(); }
-function equationBrzycki () { processRawLiftData("Brzycki"); myChart.update(); }
-function equationMcGlothin () { processRawLiftData("McGlothin"); myChart.update(); }
-function equationLombardi () { processRawLiftData("Lombardi"); myChart.update(); }
-function equationMayhew () { processRawLiftData("Mayhew"); myChart.update(); }
-function equationOConner () { processRawLiftData("OConner"); myChart.update(); }
-function equationWathen (context) { processRawLiftData("Wathen"); myChart.update(); }
+function equationEpley () { equation = "Epley"; processRawLiftData(); myChart.update(); }
+function equationBrzycki () { equation = "Brzycki"; processRawLiftData(); myChart.update(); }
+function equationMcGlothin () { equation = "McGLothin"; processRawLiftData(); myChart.update(); }
+function equationLombardi () { equation = "Lombardi"; processRawLiftData(); myChart.update(); }
+function equationMayhew () { equation = "Mayhew"; processRawLiftData(); myChart.update(); }
+function equationOConner () { equation = "OConner"; processRawLiftData(); myChart.update(); }
+function equationWathen () { equation = "Wathen"; processRawLiftData(); myChart.update(); }
 
 // Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
