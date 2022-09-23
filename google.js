@@ -21,7 +21,7 @@ let ssId;
  */
 function gapiLoaded() {
   gapi.load('picker', intializePicker);
-  gapi.load('client', intializeGapiClient);
+  // gapi.load('client', intializeGapiClient);
 }
 
 /**
