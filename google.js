@@ -22,7 +22,10 @@ function gisLoaded() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
-    callback: '', // defined later
+    callback: (tokenResponse) => {
+	accessToken = tokenResponse.access_token;
+  	createPicker();
+    },
   });
 }
 
@@ -40,22 +43,7 @@ function intializeGapiClient() {
 // Slightly lazy approach as we are meant to disable the button until the 
 // gapi.load for picker has been succesful.
 function loadGooglePicker() {
-  tokenClient.callback = async (response) => {
-    if (response.error !== undefined) {
-    throw (response);
-    }
-    accessToken = response.access_token;
-    await createPicker();
-  };
-
-  if (accessToken === null) {
-    // Prompt the user to select a Google Account and ask for consent to share their data
-    // when establishing a new session.
-    tokenClient.requestAccessToken({prompt: 'consent'});
-  } else {
-    // Skip display of account chooser and consent dialog for an existing session.
-    tokenClient.requestAccessToken({prompt: ''});
-  }
+  tokenClient.requestAccessToken(); // If token is provided, the callback will load picker
 }
 
 function createPicker() {
