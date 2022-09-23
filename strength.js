@@ -148,7 +148,7 @@ function processRawLiftData(equation) {
   processedData.sort((a, b) => b.graphData.length - a.graphData.length);
 
   // Find achievements and put on chart
-  //processAchievements("Brzycki");
+  processAchievements("Brzycki");
 }
 
 // Find interesting achievements and add to chart annotation config
@@ -187,6 +187,9 @@ function processAchievements(equation) {
 
   // Iterate through each lift in processedData and convert any achievements into chart annotation config
   processedData.forEach((e, index) => {
+
+    if (index >= maxChartLines) return; // We can only draw annotations where we have made lines
+
     if (e.best1RM) {
       // Set point annotation for .best1RM
       liftAnnotations[`${e.name}_best_1RM`] = createAchievementAnnotation(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
