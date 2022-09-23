@@ -112,6 +112,8 @@ function readGoogleSheetsData (ssId) {
 
   request.then(function(response) {
     // We have the google sheet data
+
+    if (myChart !== null) prepareDataRefresh(true);
     createChart(response.result.values);
 
     // Call this function again in 20 seconds
