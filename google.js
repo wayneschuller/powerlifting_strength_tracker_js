@@ -1,62 +1,44 @@
-// Helper functions for Google Drive/Sheets data integration
-
-const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
+// Helper functions for Google Sheets data integration
 
 // This key pairing will only work from wayneschuller.github.io
+// It authorises only a very minimal read only API range to get GSheets lifting history data
 // If you fork the code you must use your own key.
 const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
 const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
 const APP_ID = '465438544924';
-const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
 let tokenClient;
 let accessToken = null;
-let pickerInited = false;
-let gapiInited = false;
-let gisInited = false;
 let ssId;
 
-/**
- * Callback after api.js is loaded.
- */
+// Called onload when html has sourced https://apis.google.com/js/api.js
 function gapiLoaded() {
-  gapi.load('picker', intializePicker);
-  gapi.load('client', intializeGapiClient);
+  gapi.load('client:picker', intializeGapiClient);
 }
 
-/**
- * Callback after Google Identity Services are loaded.
- */
+// Called onload when html has sourced https://accounts.google.com/gsi/client
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 function gisLoaded() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
     callback: '', // defined later
   });
-  gisInited = true;
 }
 
-/**
- * Callback after the API client is loaded. Loads the
- * discovery doc to initialize the API.
- */
-function intializePicker() {
-  pickerInited = true;
-}
-
-
+// Generate methods for gapi.client.sheets
+// Callback for when gapi.load has completed
+const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 function intializeGapiClient() {
     gapi.client.init({
       apiKey: API_KEY,
       discoveryDocs: [DISCOVERY_DOC],
     });
-    gapiInited = true;
 }
 
-
-/**
- *  Sign in the user upon button click and call createPicker to choose a google sheet
- */
+// Handler function for HTML button "Load data from Google Sheets"
+// Slightly lazy approach as we are meant to disable the button until the 
+// gapi.load for picker has been succesful.
 function loadGooglePicker() {
   tokenClient.callback = async (response) => {
     if (response.error !== undefined) {
@@ -91,16 +73,17 @@ function createPicker() {
 function pickerCallback(data) {
   if (data.action !== google.picker.Action.PICKED) return; // nothing picked
 
-  console.log(`Result: ${JSON.stringify(data, null, 2)}`);
+  // console.log(`Picker result: ${JSON.stringify(data, null, 2)}`);
 
   ssId = data.docs[0].id; // Select the first ID they picked
+	
   chartTitle = `Google Sheet: ${data.docs[0].name}`;
 
   readGoogleSheetsData(ssId);
 }
 
 function readGoogleSheetsData (ssId) {
-  console.log(`Ask google sheets for data.`); 
+  console.log(`Ask google sheets for data from ${ssId}`); 
 
   // The user chose a spreadsheet, load the values via API
   let request = gapi.client.sheets.spreadsheets.values.get({
@@ -116,7 +99,7 @@ function readGoogleSheetsData (ssId) {
     if (myChart !== null) prepareDataRefresh(true);
     createChart(response.result.values);
 
-    // Call this function again in 20 seconds
+    // Call this function again in 20 seconds to auto refresh Google Sheet data
     setTimeout(function run() { 
        readGoogleSheetsData(ssId);
     }, 20000);
