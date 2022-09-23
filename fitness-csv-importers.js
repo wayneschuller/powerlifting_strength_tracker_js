@@ -77,6 +77,7 @@ function parseBespokeRow(row, index) {
     else lastDate = date; // Remember good date in case we need it in a later row
 
   let liftType = row[exercise_name_COL];
+
   // If lift type is empty we need to use the previous lift type (via liftType global)
   if (liftType === null || liftType === '') liftType = lastLiftType;
     else lastLiftType = liftType; // Remember good life type in case we need it in a later row

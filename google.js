@@ -115,9 +115,9 @@ function readGoogleSheetsData (ssId) {
     createChart(response.result.values);
 
     // Call this function again in 20 seconds
-    // setTimeout(function run() { 
-    //   readGoogleSheetsData(ssId);
-    // }, 20000);
+    setTimeout(function run() { 
+       readGoogleSheetsData(ssId);
+    }, 20000);
   }, function(reason) {
     console.error(`error: ${reason.result.error.message}`);
   });
