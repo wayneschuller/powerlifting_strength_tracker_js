@@ -23,8 +23,8 @@ function gisLoaded() {
     client_id: CLIENT_ID,
     scope: SCOPES,
     callback: (tokenResponse) => {
-	accessToken = tokenResponse.access_token;
-  	createPicker();
+	    accessToken = tokenResponse.access_token;
+  	  createPicker();
     },
   });
 }
@@ -33,10 +33,10 @@ function gisLoaded() {
 // Callback for when gapi.load has completed
 const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 function intializeGapiClient() {
-    gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: [DISCOVERY_DOC],
-    });
+  gapi.client.init({
+    apiKey: API_KEY,
+    discoveryDocs: [DISCOVERY_DOC],
+  });
 }
 
 // Handler function for HTML button "Load data from Google Sheets"
@@ -46,6 +46,7 @@ function loadGooglePicker() {
   tokenClient.requestAccessToken(); // If token is provided, the callback will load picker
 }
 
+// Once we have a token we can open a Google Drive picker
 function createPicker() {
   const picker = new google.picker.PickerBuilder()
     .setDeveloperKey(API_KEY)
@@ -82,8 +83,7 @@ function readGoogleSheetsData (ssId) {
   });
 
   request.then(function(response) {
-    // We have the google sheet data
-
+    // Gapi sheets get request successful
     if (myChart !== null) prepareDataRefresh(true);
     createChart(response.result.values);
 
@@ -92,6 +92,7 @@ function readGoogleSheetsData (ssId) {
        readGoogleSheetsData(ssId);
     }, 20000);
   }, function(reason) {
+    // Gapi sheets get request error
     console.error(`error: ${reason.result.error.message}`);
   });
 }
