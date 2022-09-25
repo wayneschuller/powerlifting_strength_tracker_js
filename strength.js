@@ -32,9 +32,9 @@ function createChart(data) {
   // Use the most popular lift to set some aesthetic x-axis padding at start and end
   // Right now only do this once on first csv load.
   // There is a chance loading another data set will require a new range, but unlikely.
-  padDateMin = new Date(processedData[0].graphData[0].x);
+  padDateMin = new Date(processedData[0].e1rmLineData[0].x);
   padDateMin = padDateMin.setDate(padDateMin.getDate() - 4);
-  padDateMax = new Date(processedData[0].graphData[processedData[0].graphData.length - 1].x);
+  padDateMax = new Date(processedData[0].e1rmLineData[processedData[0].e1rmLineData.length - 1].x);
   padDateMax = padDateMax.setDate(padDateMax.getDate() + 14);
 
   // Create the chart.js chart
@@ -72,20 +72,25 @@ function processRawLiftData() {
     var url = lift.url;
     if (!url) url = "";
 
+    var afterLabel = [];
+    if (lift.notes.length) afterLabel.push(lift.notes);
+
     // Do we already have any processed data on this date?
-    let dateIndex = processedData[liftIndex].graphData.findIndex(processedLift => processedLift.x == lift.date);
+    let dateIndex = processedData[liftIndex].e1rmLineData.findIndex(processedLift => processedLift.x == lift.date);
 
     if (dateIndex === -1) {
       // Push new lift on this new date (in chartjs friendly format)
-      processedData[liftIndex].graphData.push(
+      processedData[liftIndex].e1rmLineData.push(
       {
         x: lift.date, 
         y: oneRepMax,
         label: label,
         method: equation,
-        notes: lift.notes,
+        afterLabel: afterLabel,
         isUpdated: true,
         url: url,
+        reps: lift.reps,
+        weight: lift.weight,
       });
       continue; // Continue iterating through rawLiftData
     }
@@ -94,29 +99,31 @@ function processRawLiftData() {
     // Handle a number of cases where the raw lift date has a date match in the processed graph data.
 
     // If we are changing equation method, then update the y value
-    if (processedData[liftIndex].graphData[dateIndex].method != equation) {
-        processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
-        processedData[liftIndex].graphData[dateIndex].method = equation;
+    if (processedData[liftIndex].e1rmLineData[dateIndex].method != equation) {
+        processedData[liftIndex].e1rmLineData[dateIndex].y = oneRepMax;
+        processedData[liftIndex].e1rmLineData[dateIndex].method = equation;
         continue; // Continue iterating through rawLiftData
     }
 
     // If this processed lift is stale and is the same e1rm/date as this raw lift, then refresh it 
     // This is important for refreshing data from Google Sheets
-    if (processedData[liftIndex].graphData[dateIndex].isUpdated === false && 
-      oneRepMax === processedData[liftIndex].graphData[dateIndex].y) {
-        processedData[liftIndex].graphData[dateIndex].isUpdated = true;
+    if (processedData[liftIndex].e1rmLineData[dateIndex].isUpdated === false && 
+      oneRepMax === processedData[liftIndex].e1rmLineData[dateIndex].y) {
+        processedData[liftIndex].e1rmLineData[dateIndex].isUpdated = true;
         continue; // Continue iterating through rawLiftData
     }
 
     // If the raw lift e1rm is higher than what we had on this date, then update.
     // Because our chart always has the best lift per day
-    if (oneRepMax > processedData[liftIndex].graphData[dateIndex].y) {
-        processedData[liftIndex].graphData[dateIndex].y = oneRepMax;
-        processedData[liftIndex].graphData[dateIndex].label = label;
-        processedData[liftIndex].graphData[dateIndex].notes = lift.notes; 
-        processedData[liftIndex].graphData[dateIndex].method = equation;
-        processedData[liftIndex].graphData[dateIndex].isUpdated = true;
-        processedData[liftIndex].graphData[dateIndex].url = url;
+    if (oneRepMax > processedData[liftIndex].e1rmLineData[dateIndex].y) {
+        processedData[liftIndex].e1rmLineData[dateIndex].y = oneRepMax;
+        processedData[liftIndex].e1rmLineData[dateIndex].label = label;
+        processedData[liftIndex].e1rmLineData[dateIndex].afterLabel = afterLabel; 
+        processedData[liftIndex].e1rmLineData[dateIndex].method = equation;
+        processedData[liftIndex].e1rmLineData[dateIndex].isUpdated = true;
+        processedData[liftIndex].e1rmLineData[dateIndex].url = url;
+        processedData[liftIndex].e1rmLineData[dateIndex].reps = lift.reps;
+        processedData[liftIndex].e1rmLineData[dateIndex].weight = lift.weight;
         continue; // Continue iterating through rawLiftData
     } 
   }
@@ -125,11 +132,11 @@ function processRawLiftData() {
 
   // Remove any left over stale items (needed for refreshing data from Google Sheets)
   processedData.forEach(liftType => {
-    // Loop backwards through graphdata mutating it to remove stale entries
-    for (let i = liftType.graphData.length - 1; i >= 0; i--) {
-      if (liftType.graphData[i].isUpdated === false) { 
-        // console.log(`Found stale ${liftType.name} graph entry #${i} is ${JSON.stringify(liftType.graphData[i])}`);
-        liftType.graphData.splice(i, 1);
+    // Loop backwards through e1rmLineData mutating it to remove stale entries
+    for (let i = liftType.e1rmLineData.length - 1; i >= 0; i--) {
+      if (liftType.e1rmLineData[i].isUpdated === false) { 
+        // console.log(`Found stale ${liftType.name} graph entry #${i} is ${JSON.stringify(liftType.e1rmLineData[i])}`);
+        liftType.e1rmLineData.splice(i, 1);
       }
     }
   });
@@ -137,14 +144,14 @@ function processRawLiftData() {
   // We now know how many lift types we have. So reduce the number of expected chart lines if needed.
   if (processedData.length < minChartLines) minChartLines = processedData.length;
 
-  // Every element of processedData now has a graphData array
-  // Let's sort each graphData array by date (x entry) so it draws lines correctly
+  // Every element of processedData now has a e1rmLineData array
+  // Let's sort each e1rmLineData array by date (x entry) so it draws lines correctly
   // (FIXME: write a custom YYYY-MM-DD compare function as 'new Date' in a sort function is frowned upon)
-  // FIXME: if we presort raw lift data, then graphdata will already be sorted
-  processedData.forEach(arr => arr.graphData.sort((a,b) => new Date(a.x) - new Date(b.x)));
+  // FIXME: if we presort raw lift data, then e1rmLineData will already be sorted
+  processedData.forEach(arr => arr.e1rmLineData.sort((a,b) => new Date(a.x) - new Date(b.x)));
 
   // Also sort our processedData so the most popular lift types get charts first
-  processedData.sort((a, b) => b.graphData.length - a.graphData.length);
+  processedData.sort((a, b) => b.e1rmLineData.length - a.e1rmLineData.length);
 
   // Find achievements and put on chart
   processAchievements();
@@ -193,8 +200,8 @@ function processAchievements() {
       liftAnnotations[`${e.name}_best_1RM`] = createAchievementAnnotation(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
 
       // Update the label with some encouragement
-      const dateIndex = e.graphData.findIndex(lift => lift.x === e.best1RM.date);
-      e.graphData[dateIndex].achievements = `Best ${e.name} 1RM of all time!`;
+      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best1RM.date);
+      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 1RM of all time!`);
     }
 
     if (e.best3RM) {
@@ -203,8 +210,8 @@ function processAchievements() {
       liftAnnotations[`${e.name}_best_3RM`] = createAchievementAnnotation(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);
 
       // Update the label with some encouragement
-      const dateIndex = e.graphData.findIndex(lift => lift.x === e.best3RM.date);
-      e.graphData[dateIndex].achievements = `Best ${e.name} 3RM of all time!`;
+      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best3RM.date);
+      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 3RM of all time!`);
     }
 
     if (e.best5RM) {
@@ -213,8 +220,8 @@ function processAchievements() {
       liftAnnotations[`${e.name}_best_5RM`] = createAchievementAnnotation(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);
 
       // Update the label with some encouragement
-      const dateIndex = e.graphData.findIndex(lift => lift.x === e.best5RM.date);
-      e.graphData[dateIndex].achievements = `Best ${e.name} 5RM of all time!`;
+      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best5RM.date);
+      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 5RM of all time!`);
     }
   });
 }
@@ -297,7 +304,7 @@ function prepareDataRefresh(replaceData) {
 
   // Iterate through processedData and mark everything as stale
   processedData.forEach(liftType => {
-      liftType.graphData.forEach(lift => {
+      liftType.e1rmLineData.forEach(lift => {
         lift.isUpdated = false;
       });
   });
@@ -324,7 +331,7 @@ function createDataSets(min, max) {
     if (i >= min) hidden = true; // Initially hide the lines above the minimum
 
     // Check if we have this data to chart, then push it on
-    if (processedData[i] && processedData[i].name && processedData[i].graphData)
+    if (processedData[i] && processedData[i].name && processedData[i].e1rmLineData)
       dataSets.push({
         label: processedData[i].name,
         backgroundColor: color,
@@ -336,7 +343,7 @@ function createDataSets(min, max) {
         hoverRadius: 10,
         cubicInterpolationMode: 'monotone',
         hidden: hidden,
-        data: processedData[i].graphData,
+        data: processedData[i].e1rmLineData,
       });
   }
   return dataSets;
@@ -422,10 +429,8 @@ function getChartConfig () {
               return context.raw.label; // Tooltip information about the lift
             },
             afterLabel: function(context) {
-              const labels = [];
-              if (context.raw.notes) labels.push(context.raw.notes);
-              if (context.raw.achievements) labels.push(context.raw.achievements);
-              return labels; // Tooltip information about any achievements
+              if (context.raw.afterLabel.length > 0) 
+                return context.raw.afterLabel; // Tooltip information about any notes and achievements
             },
             footer: function(context) {
               const url = context[0].raw.url;
@@ -468,7 +473,7 @@ function getChartConfig () {
 // Used to detect a click on a graph point and open URL in the data.
 function chartClickHandler (event, item) {
   if (item && item.length > 0) {
-    const url = processedData[item[0].datasetIndex].graphData[item[0].index].url;
+    const url = processedData[item[0].datasetIndex].e1rmLineData[item[0].index].url;
     if (url) window.open(url);
   }
 }
@@ -547,7 +552,7 @@ function getProcessedLiftIndex (liftType) {
     // Create a processedLift data structure for this new lift type
     let processedLiftType = {
       name: liftType,
-      graphData: [],
+      e1rmLineData: [],
       best5RM: null,
       best3RM: null,
       best1RM: null
