@@ -72,9 +72,6 @@ function processRawLiftData() {
     var url = lift.url;
     if (!url) url = "";
 
-    var afterLabel = [];
-    if (lift.notes.length) afterLabel.push(lift.notes);
-
     // Do we already have any processed data on this date?
     let dateIndex = processedData[liftIndex].e1rmLineData.findIndex(processedLift => processedLift.x == lift.date);
 
@@ -86,7 +83,8 @@ function processRawLiftData() {
         y: oneRepMax,
         label: label,
         method: equation,
-        afterLabel: afterLabel,
+        notes: lift.notes,
+        afterLabel: [],
         isUpdated: true,
         url: url,
         reps: lift.reps,
@@ -118,7 +116,7 @@ function processRawLiftData() {
     if (oneRepMax > processedData[liftIndex].e1rmLineData[dateIndex].y) {
         processedData[liftIndex].e1rmLineData[dateIndex].y = oneRepMax;
         processedData[liftIndex].e1rmLineData[dateIndex].label = label;
-        processedData[liftIndex].e1rmLineData[dateIndex].afterLabel = afterLabel; 
+        processedData[liftIndex].e1rmLineData[dateIndex].notes = lift.notes; 
         processedData[liftIndex].e1rmLineData[dateIndex].method = equation;
         processedData[liftIndex].e1rmLineData[dateIndex].isUpdated = true;
         processedData[liftIndex].e1rmLineData[dateIndex].url = url;
@@ -157,73 +155,66 @@ function processRawLiftData() {
   processAchievements();
 }
 
-// Find interesting achievements and add to chart annotation config
+// Find interesting achievements
 function processAchievements() {
 
-  // Clear old achievements from our data and from the chart annotations config
+  // Clear old achievements 
   processedData.forEach(liftType => {
-      if (liftType.best1RM) liftType.best1RM = null;
-      if (liftType.best3RM) liftType.best3RM = null;
-      if (liftType.best5RM) liftType.best5RM = null;
+      liftType.e1rmLineData.forEach(lift => {
+        lift.afterLabel.splice(0, lift.afterLabel.length); // empty the array
+        if (lift.notes) lift.afterLabel.push(lift.notes); // Data source notes appear before achievements
+      });
   });
+
+  // Clear old chart annotations
   for (var member in liftAnnotations) delete liftAnnotations[member];
 
-  // Iterate through rawLiftData and put achievements into processedData
-  for (const lift of rawLiftData) {
+  // For each lift find achievements
+  processedData.forEach((liftType, index) => {
 
-    const liftIndex = getProcessedLiftIndex(lift.name);
+    if (index >= maxChartLines) return; // Achievements and annotations only useful where we have chart lines
 
-    // Assuming that the data is sorted reverse chronological, we award the achievements to the oldest lift.
-    switch (lift.reps) {
-      case 5:
-      if (processedData[liftIndex].best5RM === null || lift.weight >= processedData[liftIndex].best5RM.weight)
-        processedData[liftIndex].best5RM = lift;
-      break;
-    case 3:
-        if (processedData[liftIndex].best3RM === null || lift.weight >= processedData[liftIndex].best3RM.weight)
-         processedData[liftIndex].best3RM = lift;
-        break;
-    case 1:
-        if (processedData[liftIndex].best1RM === null || lift.weight >= processedData[liftIndex].best1RM.weight)
-        processedData[liftIndex].best1RM = lift;
-        break;
-    }
-  }
+    // Get the raw data for this lift type
+    const lifts = rawLiftData.filter(lift => lift.name === liftType.name);
 
-  // Iterate through each lift in processedData and convert any achievements into chart annotation config
-  processedData.forEach((e, index) => {
+    findPRs(lifts, 1, "single", index);
 
-    if (index >= maxChartLines) return; // We can only draw annotations where we have made lines
+    findPRs(lifts, 3, "triple", index);
 
-    if (e.best1RM) {
-      // Set point annotation for .best1RM
-      liftAnnotations[`${e.name}_best_1RM`] = createAchievementAnnotation(e.best1RM.date, e.best1RM.weight, '1RM', 'rgba(255, 99, 132, 0.25)', index);
-
-      // Update the label with some encouragement
-      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best1RM.date);
-      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 1RM of all time!`);
-    }
-
-    if (e.best3RM) {
-      // Set point annotation for .best3RM
-      let e1rm = estimateE1RM(e.best3RM.reps, e.best3RM.weight);
-      liftAnnotations[`${e.name}_best_3RM`] = createAchievementAnnotation(e.best3RM.date, e1rm, '3RM', 'rgba(255, 99, 132, 0.25)', index);
-
-      // Update the label with some encouragement
-      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best3RM.date);
-      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 3RM of all time!`);
-    }
-
-    if (e.best5RM) {
-      // Set point annotation for .best5RM
-      let e1rm = estimateE1RM(e.best5RM.reps, e.best5RM.weight);
-      liftAnnotations[`${e.name}_best_5RM`] = createAchievementAnnotation(e.best5RM.date, e1rm, '5RM', 'rgba(255, 99, 132, 0.25)', index);
-
-      // Update the label with some encouragement
-      const dateIndex = e.e1rmLineData.findIndex(lift => lift.x === e.best5RM.date);
-      e.e1rmLineData[dateIndex].afterLabel.push(`Best ${e.name} 5RM of all time!`);
-    }
+    findPRs(lifts, 5, "five", index);
   });
+}
+
+// Helper function
+function findPRs(rawLifts, reps, prName, datasetIndex) {
+    // Filter for this rep style
+    let repLifts = rawLifts.filter(lift => lift.reps === reps);
+
+    // Sort by weight. (award ties to the earlier lift)
+    repLifts.sort((a,b) => {
+      if (a.weight === b.weight) {
+        return new Date (a.date) - new Date (b.date);
+      } 
+      return b.weight - a.weight;
+    }); 
+
+    const name = processedData[datasetIndex].name;
+
+    // Process the top 20 of this rep style (if we have that many)
+    for (let i = 0; i < 20 && i < repLifts.length; i++) {
+      // Match the lift to the chart line point.
+      const dateIndex = processedData[datasetIndex].e1rmLineData.findIndex(lift => lift.x === repLifts[i].date);
+      processedData[datasetIndex].e1rmLineData[dateIndex].afterLabel.push(`#${i+1} best ${name} ${prName} of all time (${reps}@${repLifts[i].weight}${repLifts[i].units})`);
+
+      // Actual top PR gets a special annotation marker on the chart
+      if (i == 0)
+        liftAnnotations[`${name}_best_${reps}RM`] = createAchievementAnnotation(
+          repLifts[i].date, 
+          estimateE1RM(reps, repLifts[i].weight), 
+          `${reps}RM`, 
+          'rgba(255, 99, 132, 0.25)', 
+          datasetIndex);
+    }
 }
 
 // Generate chart.js annotation plugin config data for an achievement
@@ -429,8 +420,8 @@ function getChartConfig () {
               return context.raw.label; // Tooltip information about the lift
             },
             afterLabel: function(context) {
-              if (context.raw.afterLabel.length > 0) 
-                return context.raw.afterLabel; // Tooltip information about any notes and achievements
+              // afterlabel is for any notes and any achievements
+              return context.raw.afterLabel;
             },
             footer: function(context) {
               const url = context[0].raw.url;
