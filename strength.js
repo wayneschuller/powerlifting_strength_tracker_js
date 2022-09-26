@@ -158,23 +158,19 @@ function processRawLiftData() {
 // Find interesting achievements
 function processAchievements() {
 
-  // Clear old achievements 
-  processedData.forEach(liftType => {
-      liftType.e1rmLineData.forEach(lift => {
-        lift.afterLabel.splice(0, lift.afterLabel.length); // empty the array
-        if (lift.notes) lift.afterLabel.push(lift.notes); // Data source notes appear before achievements
-      });
-  });
-
   // Clear old chart annotations
   for (var member in liftAnnotations) delete liftAnnotations[member];
 
   // For each lift find achievements
   processedData.forEach((liftType, index) => {
 
+    // Clear old afterLabels with achievements so we can recreate them
     if (index >= maxChartLines) return; // Achievements and annotations only useful where we have chart lines
+      liftType.e1rmLineData.forEach(lift => {
+        lift.afterLabel.splice(1, lift.afterLabel.length); // empty everything after the notes which are always first 
+    });
 
-    // Get the raw data for this lift type
+    // Get the raw data for just this lift type
     const lifts = rawLiftData.filter(lift => lift.name === liftType.name);
 
     findPRs(lifts, 1, "single", index);
@@ -185,7 +181,7 @@ function processAchievements() {
   });
 }
 
-// Helper function
+// Helper function to find top 20 singles, threes and fives for each main lift
 function findPRs(rawLifts, reps, prName, datasetIndex) {
     // Filter for this rep style
     let repLifts = rawLifts.filter(lift => lift.reps === reps);
