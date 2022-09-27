@@ -6,7 +6,7 @@
 const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
 const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
 const APP_ID = '465438544924';
-const REFRESH_TIME = 20000; // How many milliseconds between refresh attempts of Google Sheet data
+const REFRESH_TIME = 10000; // How many milliseconds between refresh attempts of Google Sheet data
 
 let modifiedTime = -1;
 let tokenClient;
