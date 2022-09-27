@@ -169,6 +169,7 @@ function processAchievements() {
       liftType.e1rmLineData.forEach(lift => {
         lift.afterLabel.splice(0, lift.afterLabel.length); // empty array
         if (lift.notes) lift.afterLabel.push(lift.notes); // Put any notes back in first
+        else lift.afterLabel = [];
     });
 
     // Get the raw data for just this lift type

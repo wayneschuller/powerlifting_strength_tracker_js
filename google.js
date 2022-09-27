@@ -6,7 +6,9 @@
 const CLIENT_ID = "465438544924-pmnd9sp3r6tfghsr8psqim833v01et6m.apps.googleusercontent.com";
 const API_KEY = 'AIzaSyB-NZ4iBxmKqdbl3pg3ythgssjsL4v9tjY';
 const APP_ID = '465438544924';
+const REFRESH_TIME = 20000; // How many milliseconds between refresh attempts of Google Sheet data
 
+let modifiedTime = -1;
 let tokenClient;
 let accessToken = null;
 let ssId;
@@ -68,8 +70,40 @@ function pickerCallback(data) {
 	
   chartTitle = `Google Sheet: ${data.docs[0].name}`;
 
-  readGoogleSheetsData(ssId);
+  checkGoogleSheetModified(ssId);
 }
+
+// Check whether Google Sheet is modified and if so load the Google Sheet
+function checkGoogleSheetModified (ssId) {
+
+  // Get the modified time of the spreadsheet
+  let request = gapi.client.drive.files.get({
+ 		fileId: ssId,
+		fields: "modifiedTime",
+  });
+	
+  request.then(function(response) {
+
+	  if (modifiedTime == response.result.modifiedTime) {
+			console.log (`Google Sheet metadata unchanged, no refresh needed`);
+    	// Call this function again in a few seconds to auto refresh Google Sheet data
+   		setTimeout(function run() { 
+   			checkGoogleSheetModified(ssId);
+   		}, REFRESH_TIME);
+			return;
+		}
+
+	  // modifiedTime has changed.  Set new modifiedime and read Google Sheets data 
+		console.log (`Metadata changed, refreshing google sheets data from ${ssId}`);
+	  modifiedTime = response.result.modifiedTime;
+		readGoogleSheetsData(ssId);
+
+  }, function (errorResponse) {
+  	// Gapi request error
+  	console.error(`drive.files.get error: ${errorResponse.result.error.message}`);
+  });
+}
+
 
 function readGoogleSheetsData (ssId) {
   console.log(`Ask google sheets for data from ${ssId}`); 
@@ -87,12 +121,13 @@ function readGoogleSheetsData (ssId) {
     if (myChart !== null) prepareDataRefresh(true);
     createChart(response.result.values);
 
-    // Call this function again in 20 seconds to auto refresh Google Sheet data
+    // Check again later to auto refresh Google Sheet data
     setTimeout(function run() { 
-       readGoogleSheetsData(ssId);
-    }, 20000);
-  }, function(reason) {
-    // Gapi sheets get request error
-    console.error(`error: ${reason.result.error.message}`);
+       checkGoogleSheetModified(ssId);
+    }, REFRESH_TIME);
+
+  }, function(errorResponse) {
+    // Gapi request error
+    console.error(`sheets.spreadsheets.values.get error: ${errorResponse.result.error.message}`);
   });
 }
