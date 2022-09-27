@@ -167,7 +167,8 @@ function processAchievements() {
     // Clear old afterLabels with achievements so we can recreate them
     if (index >= maxChartLines) return; // Achievements and annotations only useful where we have chart lines
       liftType.e1rmLineData.forEach(lift => {
-        lift.afterLabel.splice(1, lift.afterLabel.length); // empty everything after the notes which are always first 
+        lift.afterLabel.splice(0, lift.afterLabel.length); // empty array
+        if (lift.notes) lift.afterLabel.push(lift.notes); // Put any notes back in first
     });
 
     // Get the raw data for just this lift type
