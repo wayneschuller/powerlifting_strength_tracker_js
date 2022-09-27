@@ -31,13 +31,13 @@ function gisLoaded() {
   });
 }
 
-// Generate methods for gapi.client.sheets
+// Generate methods for gapi.client.drive and gapi.client.sheets
 // Callback for when gapi.load has completed
 const DISCOVERY_DOC = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 function intializeGapiClient() {
   gapi.client.init({
     apiKey: API_KEY,
-    discoveryDocs: [DISCOVERY_DOC],
+    discoveryDocs: DISCOVERY_DOC,
   });
 }
 
@@ -87,7 +87,7 @@ function checkGoogleSheetModified (ssId) {
 	  if (modifiedTime == response.result.modifiedTime) {
 			console.log (`Google Sheet metadata unchanged, no refresh needed`);
     	// Call this function again in a few seconds to auto refresh Google Sheet data
-   		setTimeout(function run() { 
+   		setTimeout(function run() {
    			checkGoogleSheetModified(ssId);
    		}, REFRESH_TIME);
 			return;
