@@ -218,7 +218,7 @@ function findPRs(rawLifts, reps, prName, datasetIndex) {
 function createAchievementAnnotation(date, weight, text, background, datasetIndex) {
   return {
     type: 'label',
-    borderColor: (ctx) => ctx.chart.data.datasets[datasetIndex].backgroundColor,
+    borderColor: (context) => context.chart.data.datasets[datasetIndex].backgroundColor,
     borderRadius: 3,
     borderWidth: 2,
     yAdjust: 20,
@@ -362,6 +362,9 @@ function getChartConfig () {
       enabled: true
     },
       mode: 'x',
+      onZoomComplete() {
+        console.log(myChart.getZoomLevel());
+      }
     },
   };
 
@@ -384,10 +387,8 @@ function getChartConfig () {
           annotations: liftAnnotations,
         },
         datalabels: {
-          formatter: function(context) {
-            return context.y;
-            },
-          font: function(context) {
+          formatter: (context) => context.y,
+          font: (context) => {
             // Mark heavy singles in bold data labels, and the e1rm estimate data labels as italic
             const liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
             if (liftSingle === -1)
@@ -404,23 +405,18 @@ function getChartConfig () {
           titleFont: { size: 14 },
           bodyFont: { size: 14 },
           callbacks: {
-            title: function(context) {
+            title: (context) => {
               const d = new Date(context[0].parsed.x)
               const formattedDate = d.toLocaleString([], {
                 year:   'numeric',
                 month:  'long',
                 day:   'numeric',
               });
-               return(formattedDate);
+              return formattedDate;
             },
-            label: function(context) {
-              return context.raw.label; // Tooltip information about the lift
-            },
-            afterLabel: function(context) {
-              // afterlabel is for any notes and any achievements
-              return context.raw.afterLabel;
-            },
-            footer: function(context) {
+            label: (context) => context.raw.label, // Tooltip information about the lift
+            afterLabel: (context) => context.raw.afterLabel, // afterlabel is for any notes and any achievements
+            footer: (context) => {
               const url = context[0].raw.url;
               if (url) return `Click to open ${url}`; // Tooltip reminder they can click to open video
             }
@@ -447,8 +443,8 @@ function getChartConfig () {
           suggestedMin: 0,
           ticks: {
             font: { size: 15 },
-            callback: function (value) {
-              return value + unitType;
+            callback: (value) => {
+              return `${value}${unitType}`;
             },
           },
         },
