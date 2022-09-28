@@ -232,7 +232,7 @@ function createAchievementAnnotation(date, weight, text, background, datasetInde
       right: 2,
       bottom: 1,
     },
-    display(chart, options) {
+    display: (chart, options) => {
       // Only show if dataset line is visible on chart
       let meta = chart.chart.getDatasetMeta(datasetIndex);
       if (meta === undefined) return false;
@@ -362,7 +362,7 @@ function getChartConfig () {
       enabled: true
     },
       mode: 'x',
-      onZoomComplete() {
+      onZoomComplete: () => {
         console.log(myChart.getZoomLevel());
       }
     },
