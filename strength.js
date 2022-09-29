@@ -48,6 +48,13 @@ function createChart(data) {
   // Hide the file upload button now. We could support later extra uploads in the future.
   let uploadBox = document.getElementById("uploadBox");
   uploadBox.style.display = "none";
+
+  // Set the zoom/pan to the last 6 months of data if we have that much
+  let xAxisMin = new Date(padDateMax - (1000*60*60*24*30*6));
+  if (xAxisMin < padDateMin) xAxisMin = padDateMin;
+  let xAxisMax = new Date(padDateMax);
+  myChart.zoomScale('xAxis', {min: xAxisMin, max: xAxisMax }, 'default');
+
 }
 
 // Process the rawLiftData array of lifts into processedData (AKA charts.js compatible graph data)
@@ -346,13 +353,18 @@ function getChartConfig () {
 
   const zoomOptions = {
     limits: {
-      // FIXME: we can work out sensible values from our data set and unit type
       x: { min: 'original', max: 'original', minRange: 50 },
       y: { min: 'original', max: 'original', minRange: 200 },
     },
     pan: {
       enabled: true,
       mode: 'x',
+      onPanComplete: () => {
+        // Test tracking chart zoom/pan changes
+        // xAxisMin = new Date(myChart.scales.xAxis.min);
+        // xAxisMax = new Date(myChart.scales.xAxis.max);
+        // console.log(`Range from: ${xAxisMin.getUTCFullYear()}-${xAxisMin.getUTCMonth()+1}-${xAxisMin.getUTCDate()} to now ${xAxisMax.getUTCFullYear()}-${xAxisMax.getUTCMonth()+1}-${xAxisMax.getUTCDate()}`);
+      }
     },
     zoom: {
       wheel: {
@@ -363,7 +375,8 @@ function getChartConfig () {
     },
       mode: 'x',
       onZoomComplete: () => {
-        console.log(myChart.getZoomLevel());
+        // Test tracking chart zoom/pan changes
+        // console.log(`Zoom: ${myChart.getZoomLevel()} X-Axis: Min: ${myChart.scales.xAxis.min} Max: ${myChart.scales.xAxis.max} (padDateMax: ${padDateMax})`);
       }
     },
   };
