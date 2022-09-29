@@ -466,8 +466,28 @@ function chartClickHandler (event, item) {
   }
 }
 
-function resetZoom () {
-  if (myChart) myChart.resetZoom();
+// Callback handler for button to easy zoom in and out
+function toggleZoom () {
+  const toggleInput = document.getElementById("toggleZoom");
+  if (toggleInput.value == "Show All Time") {
+    // The user wants to zoom out to show all data
+    myChart.resetZoom();
+
+    // Change the toggle button
+    toggleInput.value = "Show Recent";
+    toggleInput.innerHTML = "Show Recent"; // FIXME: why do we set both .value and .innerHTML???
+  } else {
+    // The user wants to zoom in to show recent data 
+    // Set the zoom/pan to the last 6 months of data if we have that much
+    let xAxisMin = new Date(padDateMax - (1000*60*60*24*30*6));
+    if (xAxisMin < padDateMin) xAxisMin = padDateMin;
+    let xAxisMax = new Date(padDateMax);
+    myChart.zoomScale('xAxis', {min: xAxisMin, max: xAxisMax }, 'default');
+
+    // Change the toggle button
+    toggleInput.value = "Show All Time";
+    toggleInput.innerHTML = "Show All Time";
+  }
 }
 
 // Callback handlers for equation html dropup menu
@@ -481,22 +501,22 @@ function equationWathen () { equation = "Wathen"; processRawLiftData(); myChart.
 
 // Show/hide the chart.js achievement annotations on the chart
 function toggleAchievements (context) {
-  const toggleAchInput = document.getElementById("toggleAchievements");
-  if (toggleAchInput.value == "Hide") {
-    toggleAchInput.value = "Show";
-    toggleAchInput.innerHTML = "Show Achievements";
-
+  const toggleInput = document.getElementById("toggleAchievements");
+  if (toggleInput.value == "Hide") {
     // The user wants to hide achievements overlay
     myChart.config.options.plugins.annotation.annotations = null;
 
+    // Change the toggle button
+    toggleInput.value = "Show";
+    toggleInput.innerHTML = "Show Achievements";
   } else {
-    toggleAchInput.value = "Hide";
-    toggleAchInput.innerHTML = "Hide Achievements";
-
     // The user wants to show achievements overlay
     myChart.config.options.plugins.annotation.annotations = liftAnnotations;
-  }
 
+    // Change the toggle button
+    toggleInput.value = "Hide";
+    toggleInput.innerHTML = "Hide Achievements";
+  }
   myChart.update();
 }
 
