@@ -48,6 +48,13 @@ function createChart(data) {
   // Hide the file upload button now. We could support later extra uploads in the future.
   let uploadBox = document.getElementById("uploadBox");
   uploadBox.style.display = "none";
+
+  // Set the zoom/pan to the last 6 months of data if we have that much
+  let xAxisMin = new Date(padDateMax - (1000*60*60*24*30*6));
+  if (xAxisMin < padDateMin) xAxisMin = padDateMin;
+  let xAxisMax = new Date(padDateMax);
+  myChart.zoomScale('xAxis', {min: xAxisMin, max: xAxisMax }, 'default');
+
 }
 
 // Process the rawLiftData array of lifts into processedData (AKA charts.js compatible graph data)
@@ -219,7 +226,7 @@ function findPRs(rawLifts, reps, prName, datasetIndex) {
 function createAchievementAnnotation(date, weight, text, background, datasetIndex) {
   return {
     type: 'label',
-    borderColor: (ctx) => ctx.chart.data.datasets[datasetIndex].backgroundColor,
+    borderColor: (context) => context.chart.data.datasets[datasetIndex].backgroundColor,
     borderRadius: 3,
     borderWidth: 2,
     yAdjust: 20,
@@ -233,7 +240,7 @@ function createAchievementAnnotation(date, weight, text, background, datasetInde
       right: 2,
       bottom: 1,
     },
-    display(chart, options) {
+    display: (chart, options) => {
       // Only show if dataset line is visible on chart
       let meta = chart.chart.getDatasetMeta(datasetIndex);
       if (meta === undefined) return false;
@@ -347,13 +354,18 @@ function getChartConfig () {
 
   const zoomOptions = {
     limits: {
-      // FIXME: we can work out sensible values from our data set and unit type
       x: { min: 'original', max: 'original', minRange: 50 },
       y: { min: 'original', max: 'original', minRange: 200 },
     },
     pan: {
       enabled: true,
       mode: 'x',
+      onPanComplete: () => {
+        // Test tracking chart zoom/pan changes
+        // xAxisMin = new Date(myChart.scales.xAxis.min);
+        // xAxisMax = new Date(myChart.scales.xAxis.max);
+        // console.log(`Range from: ${xAxisMin.getUTCFullYear()}-${xAxisMin.getUTCMonth()+1}-${xAxisMin.getUTCDate()} to now ${xAxisMax.getUTCFullYear()}-${xAxisMax.getUTCMonth()+1}-${xAxisMax.getUTCDate()}`);
+      }
     },
     zoom: {
       wheel: {
@@ -363,6 +375,10 @@ function getChartConfig () {
       enabled: true
     },
       mode: 'x',
+      onZoomComplete: () => {
+        // Test tracking chart zoom/pan changes
+        // console.log(`Zoom: ${myChart.getZoomLevel()} X-Axis: Min: ${myChart.scales.xAxis.min} Max: ${myChart.scales.xAxis.max} (padDateMax: ${padDateMax})`);
+      }
     },
   };
 
@@ -385,10 +401,8 @@ function getChartConfig () {
           annotations: liftAnnotations,
         },
         datalabels: {
-          formatter: function(context) {
-            return context.y;
-            },
-          font: function(context) {
+          formatter: (context) => context.y,
+          font: (context) => {
             // Mark heavy singles in bold data labels, and the e1rm estimate data labels as italic
             const liftSingle = context.dataset.data[context.dataIndex].label.indexOf("Potential");
             if (liftSingle === -1)
@@ -405,23 +419,18 @@ function getChartConfig () {
           titleFont: { size: 14 },
           bodyFont: { size: 14 },
           callbacks: {
-            title: function(context) {
+            title: (context) => {
               const d = new Date(context[0].parsed.x)
               const formattedDate = d.toLocaleString([], {
                 year:   'numeric',
                 month:  'long',
                 day:   'numeric',
               });
-               return(formattedDate);
+              return formattedDate;
             },
-            label: function(context) {
-              return context.raw.label; // Tooltip information about the lift
-            },
-            afterLabel: function(context) {
-              // afterlabel is for any notes and any achievements
-              return context.raw.afterLabel;
-            },
-            footer: function(context) {
+            label: (context) => context.raw.label, // Tooltip information about the lift
+            afterLabel: (context) => context.raw.afterLabel, // afterlabel is for any notes and any achievements
+            footer: (context) => {
               const url = context[0].raw.url;
               if (url) return `Click to open ${url}`; // Tooltip reminder they can click to open video
             }
@@ -448,8 +457,8 @@ function getChartConfig () {
           suggestedMin: 0,
           ticks: {
             font: { size: 15 },
-            callback: function (value) {
-              return value + unitType;
+            callback: (value) => {
+              return `${value}${unitType}`;
             },
           },
         },
