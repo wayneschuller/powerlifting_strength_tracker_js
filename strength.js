@@ -360,12 +360,6 @@ function getChartConfig () {
     pan: {
       enabled: true,
       mode: 'x',
-      onPanComplete: () => {
-        // Test tracking chart zoom/pan changes
-        // xAxisMin = new Date(myChart.scales.xAxis.min);
-        // xAxisMax = new Date(myChart.scales.xAxis.max);
-        // console.log(`Range from: ${xAxisMin.getUTCFullYear()}-${xAxisMin.getUTCMonth()+1}-${xAxisMin.getUTCDate()} to now ${xAxisMax.getUTCFullYear()}-${xAxisMax.getUTCMonth()+1}-${xAxisMax.getUTCDate()}`);
-      }
     },
     zoom: {
       wheel: {
@@ -375,10 +369,6 @@ function getChartConfig () {
       enabled: true
     },
       mode: 'x',
-      onZoomComplete: () => {
-        // Test tracking chart zoom/pan changes
-        // console.log(`Zoom: ${myChart.getZoomLevel()} X-Axis: Min: ${myChart.scales.xAxis.min} Max: ${myChart.scales.xAxis.max} (padDateMax: ${padDateMax})`);
-      }
     },
   };
 
