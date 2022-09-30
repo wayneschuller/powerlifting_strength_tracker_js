@@ -32,15 +32,15 @@
             <canvas id="myChartCanvas"></canvas>
             <div class="chartControlsBox" id="chartControlsBox">
                     <div class="dropup">
-                        <button class="dropbtn" id="equationButton">Choose 1RM Equation</button>
+                        <button class="dropbtn" id="equationButton">Change 1RM Equation</button>
                         <div class="dropup-content">
-                            <a onclick="equationEpley()">Epley</a>
-                            <a onclick="equationBrzycki()">Brzycki</a>
-                            <a onclick="equationMcGlothin()">McGlothin</a>
-                            <a onclick="equationLombardi()">Lombardi</a>
-                            <a onclick="equationMayhew()">Mayhew et al.</a>
-                            <a onclick="equationOConner()">O'Conner et al.</a>
-                            <a onclick="equationWathen()">Wathen</a>
+                            <a class="equations" onclick="changeEquation(event, 'Epley')">Epley</a>
+                            <a class="equations active" onclick="changeEquation(event, 'Brzycki')">Brzycki</a>
+                            <a class="equations" onclick="changeEquation(event, 'McGlothin')">McGlothin</a>
+                            <a class="equations" onclick="changeEquation(event, 'Lombardi')">Lombardi</a>
+                            <a class="equations" onclick="changeEquation(event, 'Mayhew')">Mayhew et al.</a>
+                            <a class="equations" onclick="changeEquation(event, 'OConner')">O'Conner et al.</a>
+                            <a class="equations" onclick="changeEquation(event, 'Wathen')">Wathen</a>
                             </div>
                     </div>
                     <div class="rightControls"><button id="toggleAchievements" type="button" value="Hide" onclick="toggleAchievements()">Hide Achievements</button> </div>
