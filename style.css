@@ -7,21 +7,26 @@
 
 /*************************************************************/
 /* Top menu tab bar. */
+.tabbox {
+  display: flex;
+  justify-content: center;
+}
 .tab {
-  overflow: hidden;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
 }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
+  font-family: 'Roboto Condensed', san-serif;
   background-color: inherit;
   float: left;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 8px 16px;
   transition: 0.3s;
+  font-size: x-large;
 }
 
 /* Change background color of buttons on hover */
@@ -38,8 +43,6 @@
 .tabcontent {
   display: none;
   padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
 }
 
 .tabcontent {
@@ -52,11 +55,12 @@
   to {opacity: 1;}
 }
 
-/*************************************************************/
-/* CSS for the Visualizer tab */
 .appTitle {
   margin-block: 0;
 }
+
+/*************************************************************/
+/* CSS for the Visualizer tab */
 
 .chartCard {
   width: 85vw; 
