@@ -489,40 +489,25 @@ function toggleZoom() {
 }
 
 // Callback handlers for equation html dropup menu
-function equationEpley() {
-  equation = "Epley";
+function changeEquation(event, newEquation) {
+
+  if (equation === newEquation) return; // nothing to do
+
+  // Clear class "equations"
+   links = document.getElementsByClassName("equations");
+   for (i = 0; i < links.length; i++) {
+     links[i].className = links[i].className.replace(" active", "");
+   }
+ 
+   // Add an "active" class to the button that opened the tab
+   // This will trigger the css rule to set the color
+   event.currentTarget.className += " active";
+
+  // Change the global equation and reprocess and draw the data
+  equation = newEquation;
   processRawLiftData();
   myChart.update();
-}
-function equationBrzycki() {
-  equation = "Brzycki";
-  processRawLiftData();
-  myChart.update();
-}
-function equationMcGlothin() {
-  equation = "McGLothin";
-  processRawLiftData();
-  myChart.update();
-}
-function equationLombardi() {
-  equation = "Lombardi";
-  processRawLiftData();
-  myChart.update();
-}
-function equationMayhew() {
-  equation = "Mayhew";
-  processRawLiftData();
-  myChart.update();
-}
-function equationOConner() {
-  equation = "OConner";
-  processRawLiftData();
-  myChart.update();
-}
-function equationWathen() {
-  equation = "Wathen";
-  processRawLiftData();
-  myChart.update();
+
 }
 
 // Show/hide the chart.js achievement annotations on the chart

@@ -122,4 +122,8 @@
 }
 
 /* Change color of dropup links on hover */
-.dropup-content a:hover {background-color: #d1d1d1} 
+.dropup-content a:hover {background-color: #dfd9d9} 
+
+.dropup-content a.active {
+  background-color:rgb(172, 173, 175);
+}
