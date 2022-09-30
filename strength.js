@@ -352,10 +352,10 @@ function getChartConfig() {
     datasets: createDataSets(minChartLines, maxChartLines),
   };
 
+  const zoomMinTimeRange = 1000*60*60*24*60; // 60 days limit to zoom in
   const zoomOptions = {
     limits: {
-      x: { min: "original", max: "original", minRange: 50 },
-      y: { min: "original", max: "original", minRange: 200 },
+      x: { min: "original", max: "original", minRange: zoomMinTimeRange },
     },
     pan: {
       enabled: true,
