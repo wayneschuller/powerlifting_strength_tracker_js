@@ -22,6 +22,26 @@
 </head>
 
 <body>
+<!-- Feature Menu -->
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'Visualizer')">Visualizer</button>
+  <button class="tablinks" onclick="openTab(event, 'Secret')">Secret Feature</button>
+  <button class="tablinks" onclick="openTab(event, 'Articles')">Articles</button>
+</div>
+
+<!-- Tab content -->
+<div id="Articles" class="tabcontent">
+  <h3>London</h3>
+  <p>London is the capital city of England.</p>
+</div>
+
+<div id="Secret" class="tabcontent">
+  <h3>Paris</h3>
+  <p>Paris is the capital of France.</p>
+</div>
+
+<div id="Visualizer" class="tabcontent">
+
     <h1 class="appTitle">Strength History Visualizer</h1>
 
     <p class="appTitle">Visualize your lift history using a <a href="https://en.wikipedia.org/wiki/One-repetition_maximum">1 rep max estimate</a> for different 
@@ -63,6 +83,7 @@
         fileInput.addEventListener('change', readCSV);
     </script>
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
+</div>
 
 </body>
 </html>
