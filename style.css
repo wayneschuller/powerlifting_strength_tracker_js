@@ -4,21 +4,20 @@
   font-family: Catamaran, Helvetica, Arial, sans-serif;
 }
 
-h1 {
-  border: 0;
-  padding: 0;
+.appTitle {
+  margin-block: 0;
 }
+
 .chartCard {
-  /* width: 90vw;  */
-  /* height: calc(100vh - 30px)  */
+  width: 90vw; 
   background: rgb(255, 255, 255);
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .chartBox {
   width: 90%; 
-  /* height: 80%; */
   padding: 10px 20px;
   border-radius: 20px;
   border: solid 3px rgb(80, 80, 87);
