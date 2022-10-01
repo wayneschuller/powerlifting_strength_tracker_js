@@ -64,11 +64,32 @@
 
 .oneRepMaxCalc {
   font-size: 2vw;
+  display: table;
+}
+
+.oneRepMaxCalc p {
+  display: table-row;
+}
+
+.oneRepMaxCalc label {
+  display: table-cell;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.oneRepMaxCalc b {
+  display: table-cell;
+  text-align: center;
 }
 
 .oneRepMaxCalc input {
   border-color: aqua;
   font-size: 2vw;
+  display: table-cell;
+  text-align: left;
+  width: 10vw;
+  margin-bottom: 10px;
+  margin-left: 10px;
 }
 
 
