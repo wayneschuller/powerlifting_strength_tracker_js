@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Strength History Visualizer</title>
+  <title>Strength History Visualizer</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js" integrity="sha256-Ue6wom48SQbpmwW9QIk7pyVDR5Bg36SetP67V2pDkxc=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" integrity="sha256-+8RZJua0aEWg+QVVKg4LEzEEm/8RFez5Tb4JBNiV5xA=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0/dist/chartjs-plugin-datalabels.min.js" integrity="sha256-ObWzUwdMWsPTwdkX/Fy6qojnkW+RkgciyUrmSD3upw0=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js" integrity="sha256-eVNjHw5UeU0jUqPPpZHAkU1z4U+QFBBY488WvueTm88=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js" integrity="sha256-cRtVj62HOT1M3EGc+4EBacU/38hYsYrNBB48zEVn8uU=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js" integrity="sha256-K/cvey3T9ncQsfDSt8xXWePXXg8GOoYGHyy1k5s79qY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js" integrity="sha256-Ue6wom48SQbpmwW9QIk7pyVDR5Bg36SetP67V2pDkxc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" integrity="sha256-+8RZJua0aEWg+QVVKg4LEzEEm/8RFez5Tb4JBNiV5xA=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0/dist/chartjs-plugin-datalabels.min.js" integrity="sha256-ObWzUwdMWsPTwdkX/Fy6qojnkW+RkgciyUrmSD3upw0=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js" integrity="sha256-eVNjHw5UeU0jUqPPpZHAkU1z4U+QFBBY488WvueTm88=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js" integrity="sha256-cRtVj62HOT1M3EGc+4EBacU/38hYsYrNBB48zEVn8uU=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js" integrity="sha256-K/cvey3T9ncQsfDSt8xXWePXXg8GOoYGHyy1k5s79qY=" crossorigin="anonymous"></script>
 
-    <script src="strength.js"></script>
-    <script src="fitness-csv-importers.js"></script>
-    <script src="google.js"></script>
-    <link href='style.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Catamaran&family=Roboto+Condensed:wght@300">
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  <script src="strength.js"></script>
+  <script src="fitness-csv-importers.js"></script>
+  <script src="google.js"></script>
+  <script src="onerepmaxcalculator.js"></script>
+  <link href='style.css' rel='stylesheet'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Catamaran&family=Roboto+Condensed:wght@300">
+  <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 <!-- Feature Menu -->
 <div class="tabbox">
 <div class="tab">
-  <button class="tablinks" onclick="openTab(event, 'Visualizer')" id="defaultOpen">Visualizer</button>
-  <button class="tablinks" onclick="openTab(event, 'Secret')">Secret Feature</button>
+  <button class="tablinks" onclick="openTab(event, 'OneRepMaxCalc')" id="defaultOpen">One Rep Max Calculator</button>
+  <button class="tablinks" onclick="openTab(event, 'Visualizer')">Strength History Visualizer</button>
   <button class="tablinks" onclick="openTab(event, 'Articles')">Articles</button>
 </div>
 </div>
@@ -37,10 +39,17 @@
   <p class="appTitle">Various strength, lifting, and other articles.</p>
 </div>
 
-<!-- Secret Feature Content -->
-<div id="Secret" class="tabcontent">
-  <h1 class="appTitle">Secret Feature</h1>
-  <p class="appTitle">So many good ideas to come.</p>
+<!-- One Rep Max Calculator Content -->
+<div id="OneRepMaxCalc" class="tabcontent">
+  <h1 class="appTitle">One Rep Max Calculator</h1>
+  <p class="appTitle">Enter reps and weight to estimate a one rep max.</p>
+
+  <div class="oneRepMaxCalc">
+    <label for="reps">Reps:   </label><input id="reps" type="number" onchange="updateCalculator()" value="5"><br>
+    <label for="weight">Weight: </label><input id="weight" type="number" onchange="updateCalculator()"  value="225"><br>
+    <p>Estimated One Rep Max: <span id="potentialE1RM"></span></p>
+  </div>
+
 </div>
 
 <!-- Visualiser Feature Content -->
@@ -88,6 +97,8 @@
 
       // Open the default tab
       document.getElementById("defaultOpen").click();
+
+      updateCalculator(); // Update calculator with a result for defaults
     </script>
 <p>Please report bugs or feature requests to our <a href="https://github.com/wayneschuller/powerlifting_strength_tracker_js/issues">github page.</a></p>
 </div>

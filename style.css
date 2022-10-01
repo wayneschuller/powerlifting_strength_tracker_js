@@ -60,6 +60,20 @@
 }
 
 /*************************************************************/
+/* CSS for the One Rep Max Calculator tab */
+
+.oneRepMaxCalc {
+  font-size: 2vw;
+}
+
+.oneRepMaxCalc input {
+  border-color: aqua;
+  font-size: 2vw;
+}
+
+
+
+/*************************************************************/
 /* CSS for the Visualizer tab */
 
 .chartCard {
