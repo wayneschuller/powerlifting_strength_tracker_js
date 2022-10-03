@@ -62,30 +62,28 @@
 /*************************************************************/
 /* CSS for the One Rep Max Calculator tab */
 
+.calcBox {
+  display: block;
+  min-width: 50vw;
+  background: rgb(255, 255, 255);
+  justify-content: center;
+  border-radius: 20px;
+  border: solid 3px rgb(80, 80, 87);
+}
+
 .oneRepMaxCalc {
-  font-size: 2vw;
-  display: table;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 2rem; 
+  /* display: inline-block; */
 }
 
-.oneRepMaxCalc p {
-  display: table-row;
-}
-
-.oneRepMaxCalc label {
-  display: table-cell;
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-.oneRepMaxCalc b {
-  display: table-cell;
-  text-align: center;
-}
 
 .oneRepMaxCalc input {
+  font-size: 2rem; 
   border-color: aqua;
-  font-size: 2vw;
-  display: table-cell;
   text-align: left;
   width: 10vw;
   margin-bottom: 10px;

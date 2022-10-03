@@ -29,14 +29,7 @@
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'OneRepMaxCalc')" id="defaultOpen">One Rep Max Calculator</button>
   <button class="tablinks" onclick="openTab(event, 'Visualizer')">Strength History Visualizer</button>
-  <button class="tablinks" onclick="openTab(event, 'Articles')">Articles</button>
 </div>
-</div>
-
-<!-- Articles Feature Content -->
-<div id="Articles" class="tabcontent">
-  <h1 class="appTitle">Articles</h1>
-  <p class="appTitle">Various strength, lifting, and other articles.</p>
 </div>
 
 <!-- One Rep Max Calculator Content -->
@@ -44,11 +37,18 @@
   <h1 class="appTitle">One Rep Max Calculator</h1>
   <p class="appTitle">Enter reps and weight to estimate a one rep max.</p>
 
-  <div class="oneRepMaxCalc">
-    <p><label for="reps">Reps:   </label><input id="reps" type="number" onchange="updateCalculator()" value="5"></p>
-    <p><label for="weight">Weight: </label><input id="weight" type="number" onchange="updateCalculator()"  value="225"></p>
-    <p>Estimated One Rep Max: <b><span id="potentialE1RM"></span></b></p>
+  <div class="calcBox">
+    <div class="oneRepMaxCalc">
+      <p><label for="reps">Reps:   </label><input id="reps" type="number" onchange="updateCalculator()" value="5"></p>
+    </div>
+    <div class="oneRepMaxCalc">
+      <p><label for="weight">Weight: </label><input id="weight" type="number" onchange="updateCalculator()"  value="225"></p>
+    </div>
+    <div class="oneRepMaxCalc">
+      <p>Estimated One Rep Max: <b><span id="potentialE1RM"></span></b></p>
+    </div>
   </div>
+
 
 </div>
 
