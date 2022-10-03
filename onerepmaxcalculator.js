@@ -41,8 +41,13 @@ function estimateE1RM(reps, weight) {
 // Update the calculator
 // Called from the html entry elements via onchange handler
 function updateCalculator () {
-  const reps = document.getElementById('reps').value;
-  const weight = document.getElementById('weight').value;
+  let element = document.getElementById('reps');
+  if (element.value < 1) element.value = 1; // 1 is the minimum reps
+  const reps = element.value;
+
+  element = document.getElementById('weight');
+  if (element.value < 1) element.value = 1; // 1 is the minimum weight
+  const weight = element.value;
 
   // Set e1rm
   document.getElementById("potentialE1RM").innerHTML = estimateE1RM(reps, weight);
