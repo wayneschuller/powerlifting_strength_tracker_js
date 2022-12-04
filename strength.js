@@ -534,9 +534,6 @@ function getProcessedLiftIndex(liftType) {
     let processedLiftType = {
       name: liftType,
       e1rmLineData: [],
-      best5RM: null,
-      best3RM: null,
-      best1RM: null,
     };
     liftIndex = processedData.push(processedLiftType) - 1;
   }
